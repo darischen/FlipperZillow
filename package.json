@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@google/model-viewer": "^4.1.0",
+    "@webspatial/core-sdk": "^1.2.0",
+    "@webspatial/react-sdk": "^1.2.0",
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@webspatial/builder": "^1.2.0",
+    "@webspatial/next-plugin": "^0.1.10",
+    "@webspatial/platform-visionos": "^1.2.0"
+  }
+}
