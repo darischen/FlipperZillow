@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@google/model-viewer": "^4.1.0",
     "@webspatial/core-sdk": "^1.2.0",
     "@webspatial/react-sdk": "^1.2.0",
+    "elevenlabs": "^1.59.0",
     "three": "^0.172.0"
   },
   "devDependencies": {
