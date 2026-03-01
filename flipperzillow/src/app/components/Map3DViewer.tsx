@@ -17,6 +17,10 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [narrateStatus, setNarrateStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [scriptPreview, setScriptPreview] = useState<string>('');
+
   // Dispatch images to AMD cloud for 3D processing on page load
   useEffect(() => {
     if (!initialPhotos || initialPhotos.length === 0) return;
@@ -33,6 +37,28 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
       .then((d) => console.log('[dispatch]', d))
       .catch((e) => console.warn('[dispatch] failed:', e));
   }, [initialPhotos, initialAddress]);
+
+  // Start narration generation immediately so audio is ready while user browses
+  useEffect(() => {
+    if (!initialPhotos || initialPhotos.length === 0) return;
+
+    setNarrateStatus('loading');
+    console.log('[narrate] Pre-generating narration...');
+
+    fetch('/api/tour/narrate', { method: 'POST' })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Narrate API returned ${res.status}`);
+        setScriptPreview(res.headers.get('X-Script-Preview') || '');
+        const blob = await res.blob();
+        setAudioUrl(URL.createObjectURL(blob));
+        setNarrateStatus('ready');
+        console.log('[narrate] Audio ready');
+      })
+      .catch((e) => {
+        console.warn('[narrate] Pre-generation failed:', e);
+        setNarrateStatus('error');
+      });
+  }, [initialPhotos]);
 
   useEffect(() => {
     if (initialized.current) return;
@@ -486,6 +512,55 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
         <div id="ev-status" />
         <div id="ev-addressDisplay" />
       </div>
+
+      {/* AI Narration audio player — bottom left */}
+      {narrateStatus !== 'idle' && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 20,
+            left: 20,
+            background: 'rgba(0, 0, 0, 0.85)',
+            padding: '12px 16px',
+            borderRadius: 12,
+            backdropFilter: 'blur(10px)',
+            zIndex: 10,
+            maxWidth: 340,
+            color: 'white',
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            borderLeft: `3px solid ${narrateStatus === 'ready' ? '#4caf50' : narrateStatus === 'error' ? '#f44336' : '#2196F3'}`,
+          }}
+        >
+          {narrateStatus === 'loading' && (
+            <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>
+              Preparing AI narration...
+            </p>
+          )}
+          {narrateStatus === 'error' && (
+            <p style={{ margin: 0, fontSize: 12, color: '#f44336' }}>
+              Narration unavailable
+            </p>
+          )}
+          {narrateStatus === 'ready' && audioUrl && (
+            <>
+              <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', opacity: 0.6, letterSpacing: 1 }}>
+                AI Realtor Tour
+              </p>
+              {scriptPreview && (
+                <p style={{ margin: '0 0 10px', fontSize: 12, opacity: 0.75, lineHeight: 1.5, maxHeight: 56, overflow: 'hidden' }}>
+                  {scriptPreview}
+                </p>
+              )}
+              <audio
+                src={audioUrl}
+                controls
+                autoPlay
+                style={{ width: '100%', height: 36, outline: 'none' }}
+              />
+            </>
+          )}
+        </div>
+      )}
 
       {/* Info panel — bottom right */}
       <div
