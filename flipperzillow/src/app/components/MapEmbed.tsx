@@ -10,7 +10,7 @@ interface MapEmbedProps {
 
 export default function MapEmbed({ lat, lng, address }: MapEmbedProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
+  const panoramaRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function MapEmbed({ lat, lng, address }: MapEmbedProps) {
     const position = { lat, lng };
 
     if (!panoramaRef.current) {
-      panoramaRef.current = new google.maps.StreetViewPanorama(mapContainerRef.current, {
+      panoramaRef.current = new (window.google.maps as any).StreetViewPanorama(mapContainerRef.current, {
         position,
         pov: { heading: 0, pitch: 0 },
         zoom: 1,
