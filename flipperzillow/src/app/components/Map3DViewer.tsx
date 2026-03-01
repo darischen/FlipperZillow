@@ -1,9 +1,16 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ImageGallery from './ImageGallery';
 
-export default function Map3DViewer() {
+interface Map3DViewerProps {
+  initialAddress?: string;
+  initialPhotos?: string[];
+}
+
+export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }: Map3DViewerProps) {
+  const router = useRouter();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const [currentAddress, setCurrentAddress] = useState<string>('');
@@ -77,7 +84,11 @@ export default function Map3DViewer() {
           window._MapMode = maps3dLib.MapMode;
           window._Map3DElement = maps3dLib.Map3DElement;
 
-          searchAddress();
+          // If initialAddress was set in input, search it automatically
+          var addressInput = document.getElementById('ev-address');
+          if (addressInput && addressInput.value.trim()) {
+            searchAddress();
+          }
         }
 
         async function searchAddress() {
@@ -261,6 +272,13 @@ export default function Map3DViewer() {
     `;
     // Small delay so DOM elements exist before the script runs
     setTimeout(() => {
+      // Set initial address on input if provided
+      if (initialAddress) {
+        const addressInput = document.getElementById('ev-address') as HTMLInputElement;
+        if (addressInput) {
+          addressInput.value = initialAddress;
+        }
+      }
       document.body.appendChild(appScript);
     }, 100);
   }, []);
@@ -290,7 +308,7 @@ export default function Map3DViewer() {
       />
 
       {/* Image Gallery on the right */}
-      <ImageGallery address={currentAddress} />
+      <ImageGallery address={currentAddress} initialPhotos={initialPhotos} />
 
       {/* Overlay panel — matches old_earth_view.txt layout */}
       <div
@@ -308,6 +326,25 @@ export default function Map3DViewer() {
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         }}
       >
+        <button
+          onClick={() => router.back()}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: 6,
+            color: 'white',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            marginBottom: 16,
+          }}
+        >
+          ← Back to Search
+        </button>
         <h1 style={{ fontSize: 20, marginBottom: 8, fontWeight: 700 }}>FlipperZillow</h1>
         <p style={{ fontSize: 13, opacity: 0.7, marginBottom: 12, lineHeight: 1.5 }}>
           AI-Powered House Tours — View any address in full 3D
@@ -321,7 +358,7 @@ export default function Map3DViewer() {
             type="text"
             id="ev-address"
             placeholder="e.g., Santa Clara University, CA"
-            defaultValue="Santa Clara University, Santa Clara, CA"
+            defaultValue={initialAddress || "Santa Clara University, Santa Clara, CA"}
             style={{
               width: '100%',
               padding: 12,

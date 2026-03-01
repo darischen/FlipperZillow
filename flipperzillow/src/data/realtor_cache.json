@@ -1,0 +1,99 @@
+{
+  "utica, ny__12": {
+    "ts": 1709300000000,
+    "data": {
+      "data": {
+        "home_search": {
+          "count": 2,
+          "total": 16,
+          "results": [
+            {
+              "property_id": "3191443040",
+              "listing_id": "2985148194",
+              "status": "for_sale",
+              "description": {
+                "baths_consolidated": "3",
+                "beds": 7,
+                "lot_sqft": 4800,
+                "sqft": 2737,
+                "stories": 2
+              },
+              "location": {
+                "address": {
+                  "postal_code": "13501",
+                  "state": "New York",
+                  "city": "Utica",
+                  "coordinate": {
+                    "lat": 43.091351,
+                    "lon": -75.224765
+                  },
+                  "state_code": "NY",
+                  "line": "1131 Saint Vincent St"
+                }
+              },
+              "list_price": 159900,
+              "photos": [
+                {
+                  "href": "https://ap.rdcpix.com/2610d7faf6e965f807c390f4aeec69a9l-m3682841335rd-w960_h720.jpg"
+                }
+              ],
+              "primary_photo": {
+                "href": "https://ap.rdcpix.com/2610d7faf6e965f807c390f4aeec69a9l-m3682841335rd-w960_h720.jpg"
+              },
+              "href": "https://www.realtor.com/realestateandhomes-detail/1131-Saint-Vincent-St_Utica_NY_13501_M31914-43040",
+              "permalink": "1131-Saint-Vincent-St_Utica_NY_13501_M31914-43040"
+            },
+            {
+              "property_id": "3247901340",
+              "listing_id": "2983170499",
+              "status": "for_sale",
+              "description": {
+                "baths_consolidated": "2",
+                "beds": 4,
+                "lot_sqft": 3920,
+                "sqft": 2304,
+                "stories": 2
+              },
+              "location": {
+                "address": {
+                  "postal_code": "13502",
+                  "state": "New York",
+                  "city": "Utica",
+                  "coordinate": {
+                    "lat": 43.09345,
+                    "lon": -75.256408
+                  },
+                  "state_code": "NY",
+                  "line": "900 and 902 Sherman Pl"
+                }
+              },
+              "list_price": 179900,
+              "photos": [
+                {
+                  "href": "https://ap.rdcpix.com/574cc126cc1ae04df4a0a9c53fe5fa7fl-m3394368714rd-w960_h720.jpg"
+                }
+              ],
+              "primary_photo": {
+                "href": "https://ap.rdcpix.com/574cc126cc1ae04df4a0a9c53fe5fa7fl-m3394368714rd-w960_h720.jpg"
+              },
+              "href": "https://www.realtor.com/realestateandhomes-detail/900-Sherman-Pl-902_Utica_NY_13502_M32479-01340",
+              "permalink": "900-Sherman-Pl-902_Utica_NY_13502_M32479-01340"
+            }
+          ]
+        }
+      },
+      "status": true,
+      "message": "Successful"
+    }
+  },
+  "san diego, ca__12": {
+    "ts": 1772353860961,
+    "data": {
+      "data": {
+        "home_search": {
+          "results": []
+        }
+      }
+    }
+  }
+}
