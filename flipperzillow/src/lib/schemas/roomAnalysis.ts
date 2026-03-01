@@ -27,3 +27,4 @@ export const TourStartResponseSchema = z.object({
 });
 
 export type TourStartResponse = z.infer<typeof TourStartResponseSchema>;
+

@@ -17,6 +17,23 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
+  // Dispatch images to AMD cloud for 3D processing on page load
+  useEffect(() => {
+    if (!initialPhotos || initialPhotos.length === 0) return;
+
+    fetch('/api/tour/dispatch-images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_urls: initialPhotos,
+        address: initialAddress,
+      }),
+    })
+      .then((r) => r.json())
+      .then((d) => console.log('[dispatch]', d))
+      .catch((e) => console.warn('[dispatch] failed:', e));
+  }, [initialPhotos, initialAddress]);
+
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
