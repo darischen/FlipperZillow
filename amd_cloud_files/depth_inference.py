@@ -15,10 +15,11 @@ from utils import load_image_as_numpy, save_depth_as_png, timer
 sys.path.insert(0, str(config.DEPTH_ANYTHING_REPO))
 
 _model = None
+_device = None  # Track actual device used
 
 
 def _load_model():
-    global _model
+    global _model, _device
     if _model is not None:
         return _model
 
@@ -27,10 +28,25 @@ def _load_model():
     cfg = config.DEPTH_MODEL_CONFIGS[config.DEPTH_ENCODER]
     model = DepthAnythingV2(**cfg)
     model.load_state_dict(
-        torch.load(str(config.DEPTH_ANYTHING_CKPT), map_location="cpu")
+        torch.load(str(config.DEPTH_ANYTHING_CKPT), map_location="cpu", weights_only=True)
     )
-    model = model.to(config.DEVICE).eval()
-    print(f"[depth] Loaded Depth Anything V2 ({config.DEPTH_ENCODER}) on {config.DEVICE}")
+
+    # Try GPU first, fall back to CPU if ROCm has issues
+    target_device = config.DEVICE
+    try:
+        model = model.to(target_device).eval()
+        # Quick sanity check — run a tiny tensor through to catch segfaults early
+        with torch.no_grad():
+            test = torch.randn(1, 3, 32, 32, device=target_device)
+            _ = test.sum()
+        _device = target_device
+        print(f"[depth] Loaded Depth Anything V2 ({config.DEPTH_ENCODER}) on {_device}")
+    except Exception as e:
+        print(f"[depth] GPU failed ({e}), falling back to CPU")
+        model = model.cpu().eval()
+        _device = "cpu"
+        print(f"[depth] Loaded Depth Anything V2 ({config.DEPTH_ENCODER}) on CPU")
+
     _model = model
     return _model
 

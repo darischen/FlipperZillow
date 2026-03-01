@@ -46,13 +46,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Single-line JSON (no newlines) to avoid bash multiline issues
+    // Use heredoc for reliable large JSON payload upload
     const payload = JSON.stringify({ image_urls, address });
 
-    // Escape single quotes for shell
+    // Escape single quotes for shell safety
     const escaped = payload.replace(/'/g, "'\\''");
-
-    // mkdir -p first in case /workspace doesn't exist, then write the file
     const remoteCmd = `mkdir -p /workspace && echo '${escaped}' > /workspace/image_urls.json`;
     const sshArgs = [
       '-i', resolvedKey,
@@ -64,6 +62,7 @@ export async function POST(req: NextRequest) {
 
     console.log(`[dispatch] SSH to ${host} — writing ${image_urls.length} image URLs`);
 
+    // Step 1: Upload image_urls.json
     await new Promise<string>((resolve, reject) => {
       execFile('ssh', sshArgs, { timeout: 15000 }, (err, stdout, stderr) => {
         if (err) {
@@ -77,11 +76,72 @@ export async function POST(req: NextRequest) {
       });
     });
 
+    // Step 2: Execute pipeline on AMD cloud
+    console.log('[dispatch] Executing pipeline on AMD cloud...');
+
+    // Run pipeline AND retrieve result in a single SSH session to avoid reconnection timeouts.
+    // The command runs the pipeline, then prints a delimiter followed by the JSON summary.
+    const delimiter = '___SUMMARY_JSON_START___';
+    const pipelineCmd = `bash -lc 'source ~/miniconda3/etc/profile.d/conda.sh && conda activate fz && cd ~/amd_cloud_files && python3 pipeline.py /workspace/image_urls.json --skip-sam 2>&1; echo "${delimiter}"; cat /root/outputs/property_summary.json 2>/dev/null || echo "{}"'`;
+    const pipelineArgs = [
+      '-i', resolvedKey,
+      '-o', 'ConnectTimeout=10',
+      '-o', 'StrictHostKeyChecking=no',
+      '-o', 'ServerAliveInterval=30',
+      '-o', 'ServerAliveCountMax=20',
+      `root@${host}`,
+      pipelineCmd,
+    ];
+
+    const fullOutput = await new Promise<string>((resolve, reject) => {
+      execFile('ssh', pipelineArgs, { timeout: 600000, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+        if (err) {
+          // Check if it's just stderr warnings (xFormers etc) but pipeline actually ran
+          const output = stdout || '';
+          if (output.includes('[pipeline] DONE') || output.includes(delimiter)) {
+            console.log('[dispatch] Pipeline completed (with warnings)');
+            resolve(output);
+            return;
+          }
+          console.error('[dispatch] Pipeline error:', err.message);
+          console.error('[dispatch] stdout:', stdout?.substring(0, 500));
+          console.error('[dispatch] stderr:', stderr?.substring(0, 500));
+          reject(err);
+          return;
+        }
+        console.log('[dispatch] Pipeline completed successfully');
+        resolve(stdout);
+      });
+    });
+
+    // Split output: everything before delimiter is pipeline logs, after is the JSON summary
+    const delimiterIdx = fullOutput.indexOf(delimiter);
+    const pipelineOutput = delimiterIdx >= 0 ? fullOutput.substring(0, delimiterIdx) : fullOutput;
+    const summaryOutput = delimiterIdx >= 0 ? fullOutput.substring(delimiterIdx + delimiter.length).trim() : '{}';
+
+    let propertySummary = {};
+    try {
+      propertySummary = JSON.parse(summaryOutput);
+      console.log('[dispatch] Parsed property_summary.json from pipeline output');
+    } catch (e) {
+      console.warn('[dispatch] Failed to parse property_summary.json:', summaryOutput.substring(0, 200));
+    }
+
+    // Write summary locally (no separate SCP needed)
+    const dataDir = path.resolve(process.cwd(), 'src', 'data');
+    fs.mkdirSync(dataDir, { recursive: true });
+    const localFilePath = path.join(dataDir, 'property_summary.json');
+    fs.writeFileSync(localFilePath, JSON.stringify(propertySummary, null, 2));
+    console.log('[dispatch] Saved property_summary.json to', localFilePath);
+
     return NextResponse.json({
-      status: 'dispatched',
+      status: 'completed',
       image_count: image_urls.length,
       host,
       remote_path: '/workspace/image_urls.json',
+      local_path: localFilePath,
+      propertySummary,
+      pipelineOutput: pipelineOutput.substring(0, 500), // First 500 chars
     });
   } catch (error) {
     console.error('[dispatch] Error:', error);

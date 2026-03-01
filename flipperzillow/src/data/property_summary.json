@@ -1,0 +1,255 @@
+{
+  "room_count": 14,
+  "room_types": {
+    "other": 14
+  },
+  "rooms": [
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "wall",
+        "ceiling",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 25,
+        "ceiling_coverage_pct": 25,
+        "wall_coverage_pct": 50,
+        "spaciousness": "spacious"
+      }
+    }
+  ],
+  "all_detected_objects": [
+    "ceiling",
+    "floor",
+    "wall"
+  ],
+  "has_natural_light": false,
+  "overall_spaciousness": "spacious",
+  "has_3d_model": false,
+  "glb_path": null
+}

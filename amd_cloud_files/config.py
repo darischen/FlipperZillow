@@ -6,6 +6,12 @@ Adjust paths here if models live elsewhere.
 import os
 from pathlib import Path
 
+# ── ROCm environment setup (must be set before torch import) ─────
+# MI300X is gfx942 — ensure HIP targets the correct architecture
+os.environ.setdefault("HSA_OVERRIDE_GFX_VERSION", "9.4.2")
+os.environ.setdefault("HIP_VISIBLE_DEVICES", "0")
+os.environ.setdefault("PYTORCH_HIP_ALLOC_CONF", "expandable_segments:True")
+
 # ── Base paths ──────────────────────────────────────────────
 # Models are already downloaded on AMD cloud in home directory
 # If different location, set AMD_HOME environment variable
@@ -32,7 +38,7 @@ DFORMER_CKPT         = DFORMER_REPO / "checkpoints" / "DFormer_Large.pth"
 SAM3D_CFG            = SAM3D_REPO / "checkpoints" / "hf" / "pipeline.yaml"
 
 # ── Pipeline settings ──────────────────────────────────────
-DEVICE = os.environ.get("DEVICE", "cuda")  # ROCm exposes AMD GPU as cuda
+DEVICE = os.environ.get("DEVICE", "cuda")  # ROCm exposes AMD GPU as cuda via HIP
 
 # Depth Anything V2 model size: vits | vitb | vitl | vitg
 DEPTH_ENCODER = os.environ.get("DEPTH_ENCODER", "vitl")
