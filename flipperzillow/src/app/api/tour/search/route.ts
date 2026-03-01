@@ -1,39 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import Anthropic from '@anthropic-ai/sdk';
-import fs from 'fs';
-import path from 'path';
-
-// ---------- local cache ----------
-// Cache lives at src/data/realtor_cache.json (relative to Next.js src/)
-// Structure: { [cacheKey]: { ts: number, data: RealtorAPIResponse } }
-const CACHE_PATH = path.join(
-  process.cwd(),
-  'src',
-  'data',
-  'realtor_cache.json',
-);
-
-function readCache(): Record<string, { ts: number; data: any }> {
-  try {
-    if (fs.existsSync(CACHE_PATH)) {
-      return JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
-    }
-  } catch {
-    // corrupted file – start fresh
-  }
-  return {};
-}
-
-function writeCache(cache: Record<string, { ts: number; data: any }>) {
-  const dir = path.dirname(CACHE_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2));
-}
-
-function cacheKey(location: string, limit: number): string {
-  return `${location.toLowerCase().trim()}__${limit}`;
-}
+import {
+  autoComplete,
+  searchBuy,
+  searchRent,
+  normalizeListings,
+  type NormalizedListing,
+} from '@/lib/rapidapi/realtorClient';
 
 // ---------- Zod schemas ----------
 const SearchRequestSchema = z.object({
@@ -41,7 +15,7 @@ const SearchRequestSchema = z.object({
 });
 
 const ParsedQuerySchema = z.object({
-  error: z.string().optional(),
+  error: z.string().nullish(),
   location: z.string().optional(),
   status: z.enum(['for_sale', 'for_rent']).optional().nullable(),
   beds_min: z.number().int().positive().optional().nullable(),
@@ -55,169 +29,71 @@ const ParsedQuerySchema = z.object({
 
 type ParsedQuery = z.infer<typeof ParsedQuerySchema>;
 
-// ---------- Realtor.com API helpers ----------
-interface RealtorListing {
-  title: string;
-  price: string | null;
-  beds: number | null;
-  baths: number | null;
-  sqft: number | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  thumbnail_url: string | null;
-  photo_urls: string[];
-  listing_url: string;
-  lat: number | null;
-  lon: number | null;
-}
+// ---------- Location resolution via properties/auto-complete ----------
+async function resolveLocationId(location: string): Promise<string | null> {
+  try {
+    const data = await autoComplete({ input: location, limit: 5 });
+    const completions: any[] = data?.data?.autocomplete ?? [];
 
-function parseRealtorResults(apiData: any): RealtorListing[] {
-  const results =
-    apiData?.data?.home_search?.results ?? apiData?.data?.results ?? [];
-  const listings: RealtorListing[] = [];
+    // Prefer city → county → state match
+    const preferred = completions.find((c: any) =>
+      ['city', 'county', 'state', 'postal_code'].includes(c.area_type),
+    );
+    const result = preferred ?? completions[0];
 
-  for (const r of results) {
-    try {
-      const desc = r.description ?? {};
-      const addr = r.location?.address ?? {};
-      const coord = addr.coordinate ?? {};
-
-      const photos: string[] = (r.photos ?? [])
-        .map((p: any) => p.href)
-        .filter(Boolean);
-      const primaryPhoto = r.primary_photo?.href ?? null;
-      const thumbnail = primaryPhoto ?? photos[0] ?? null;
-
-      const line = addr.line ?? addr.formattedStreetLine ?? '';
-      const city = addr.city ?? '';
-      const stateCode = addr.state_code ?? addr.state ?? '';
-      const fullAddress = [line, city, stateCode].filter(Boolean).join(', ');
-
-      const beds = desc.beds ?? r.rentalExtension?.bedRange?.max ?? null;
-      const bathsRaw =
-        desc.baths_consolidated ?? r.rentalExtension?.bathRange?.max ?? null;
-      const baths = bathsRaw != null ? parseFloat(String(bathsRaw)) : null;
-
-      const listPrice = r.list_price ?? r.rentalExtension?.rentPriceRange?.max ?? null;
-      const priceStr = listPrice != null ? `$${Number(listPrice).toLocaleString()}` : null;
-
-      const sqft = desc.sqft ?? r.rentalExtension?.sqftRange?.max ?? null;
-
-      const realtorUrl =
-        r.href ??
-        (r.permalink
-          ? `https://www.realtor.com/realestateandhomes-detail/${r.permalink}`
-          : 'https://www.realtor.com');
-
-      const title =
-        `${beds ?? '?'}bd ${baths ?? '?'}ba` +
-        (sqft ? ` · ${sqft.toLocaleString()} sqft` : '') +
-        ` – ${line || city || 'Unknown'}`;
-
-      listings.push({
-        title,
-        price: priceStr,
-        beds,
-        baths,
-        sqft,
-        address: fullAddress || null,
-        city,
-        state: stateCode,
-        thumbnail_url: thumbnail,
-        photo_urls: photos,
-        listing_url: realtorUrl,
-        lat: coord.lat ?? null,
-        lon: coord.lon ?? null,
-      });
-    } catch {
-      // skip malformed entry
-    }
+    if (!result?.id) return null;
+    console.log(`[search] Resolved "${location}" → id="${result.id}" (${result.area_type})`);
+    return result.id as string;
+  } catch (e) {
+    console.error('[search] autoComplete error:', e);
+    return null;
   }
-
-  return listings;
 }
 
-async function fetchRealtorListings(
-  location: string,
+// ---------- Fetch listings using the property search APIs ----------
+async function fetchListings(
+  parsedQuery: ParsedQuery,
   limit: number = 12,
-  status: string = 'for_sale',
-): Promise<{ listings: RealtorListing[]; fromCache: boolean }> {
-  const key = cacheKey(location, limit);
-  const cache = readCache();
+): Promise<{ listings: NormalizedListing[]; fromCache: boolean }> {
+  const location = parsedQuery.location!;
+  const isRent = parsedQuery.status === 'for_rent';
 
-  // Serve from cache if available (no TTL – preserve API calls)
-  if (cache[key]) {
-    console.log(`[search] Cache HIT for "${location}"`);
-    return { listings: parseRealtorResults(cache[key].data), fromCache: true };
-  }
-
-  const rapidApiKey = process.env.RAPIDAPI_KEY;
-  const rapidApiHost = process.env.RAPIDAPI_HOST ?? 'realtor-search.p.rapidapi.com';
-
-  if (!rapidApiKey) {
-    console.error('[search] RAPIDAPI_KEY not set');
+  // Step 1: resolve to a location ID
+  const locationId = await resolveLocationId(location);
+  if (!locationId) {
+    console.warn(`[search] Could not resolve location ID for "${location}"`);
     return { listings: [], fromCache: false };
   }
 
-  const headers = {
-    'x-rapidapi-key': rapidApiKey,
-    'x-rapidapi-host': rapidApiHost,
+  // Step 2: build filter params
+  const baseParams = {
+    location: locationId,
+    resultsPerPage: limit,
+    ...(parsedQuery.beds_min != null && { bedrooms: parsedQuery.beds_min }),
+    ...(parsedQuery.baths_min != null && { bathrooms: Math.ceil(parsedQuery.baths_min) }),
+    ...(parsedQuery.price_min != null || parsedQuery.price_max != null
+      ? {
+          prices: [
+            parsedQuery.price_min ?? '',
+            parsedQuery.price_max ?? '',
+          ].join(','),
+        }
+      : {}),
   };
 
   try {
-    // Step 1: Search location to get city ID
-    const searchUrl = `https://${rapidApiHost}/agents/v2/search-location?query=${encodeURIComponent(location)}`;
-    console.log(`[search] Search location: ${searchUrl}`);
-
-    const searchRes = await fetch(searchUrl, { method: 'GET', headers });
-    if (!searchRes.ok) {
-      console.error(`[search] search-location ${searchRes.status}: ${await searchRes.text()}`);
-      return { listings: [], fromCache: false };
+    let rawData: any;
+    if (isRent) {
+      rawData = await searchRent(baseParams);
+    } else {
+      rawData = await searchBuy(baseParams);
     }
 
-    const searchData = await searchRes.json();
-    const autoComplete = searchData?.data?.agents_location_search?.auto_complete ?? [];
-    console.log(`[search] Found ${autoComplete.length} auto_complete results`);
-
-    if (autoComplete.length === 0) {
-      console.warn('[search] No location found');
-      return { listings: [], fromCache: false };
-    }
-
-    // Get the top city result
-    const topCity = autoComplete[0];
-    const cityId = topCity?.id ?? '';
-    console.log(`[search] Using location ID: ${cityId}`);
-
-    // Step 2: Query search-location again with the ID to get all listings in that location
-    const listingsUrl = `https://${rapidApiHost}/agents/v2/search-location?id=${encodeURIComponent(cityId)}&limit=${limit}`;
-    console.log(`[search] Get listings for location: ${listingsUrl}`);
-
-    const listingsRes = await fetch(listingsUrl, { method: 'GET', headers });
-    if (!listingsRes.ok) {
-      console.error(`[search] listings request ${listingsRes.status}: ${await listingsRes.text()}`);
-      return { listings: [], fromCache: false };
-    }
-
-    const listingsData = await listingsRes.json();
-    const results =
-      listingsData?.data?.home_search?.results ??
-      listingsData?.data?.results ??
-      listingsData?.results ??
-      [];
-
-    console.log(`[search] Got ${results.length} listings for "${location}"`);
-
-    // Cache results
-    const mergedData = { data: { home_search: { results: results.slice(0, limit) } } };
-    cache[key] = { ts: Date.now(), data: mergedData };
-    writeCache(cache);
-    console.log(`[search] Cached ${results.length} listings for "${location}"`);
-
-    return { listings: parseRealtorResults(mergedData), fromCache: false };
+    const listings = normalizeListings(rawData);
+    // Detect cache hit via console (we don't track it externally, default false)
+    return { listings, fromCache: false };
   } catch (e) {
-    console.error(`[search] Realtor API error: ${e}`);
+    console.error('[search] fetchListings error:', e);
     return { listings: [], fromCache: false };
   }
 }
@@ -293,12 +169,8 @@ Return JSON:
       );
     }
 
-    // 2. Fetch from Realtor.com (cache-first)
-    const { listings, fromCache } = await fetchRealtorListings(
-      parsedQuery.location,
-      12,
-      parsedQuery.status ?? 'for_sale',
-    );
+    // 2. Fetch listings using properties/auto-complete → properties/search-buy or search-rent
+    const { listings, fromCache } = await fetchListings(parsedQuery, 12);
 
     console.log(
       `[search] ${listings.length} listings (${fromCache ? 'from cache' : 'live API call'})`,
