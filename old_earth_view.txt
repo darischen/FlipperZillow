@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Street-Level Property Viewer</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e27;
+      color: white;
+    }
+
+    gmp-map-3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      max-width: 380px;
+    }
+
+    .overlay h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .overlay p {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #1976D2;
+    }
+
+    button:active {
+      background: #1565C0;
+    }
+
+    .error {
+      background: #d32f2f;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      border-left: 4px solid #ff6b6b;
+    }
+
+    .success {
+      background: #388e3c;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      border-left: 4px solid #66bb6a;
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.6;
+      margin-top: 12px;
+    }
+
+    .address-display {
+      background: rgba(33, 150, 243, 0.1);
+      border: 1px solid rgba(33, 150, 243, 0.3);
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .quick-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .quick-btn {
+      padding: 8px 12px;
+      background: rgba(33, 150, 243, 0.2);
+      border: 1px solid rgba(33, 150, 243, 0.4);
+      border-radius: 6px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-btn:hover {
+      background: rgba(33, 150, 243, 0.3);
+      border-color: rgba(33, 150, 243, 0.6);
+    }
+
+    .view-controls {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .view-btn {
+      flex: 1;
+      min-width: 70px;
+      padding: 8px 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .view-btn.active {
+      background: rgba(33, 150, 243, 0.4);
+      border-color: #2196F3;
+    }
+
+    .info-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 16px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      font-size: 12px;
+      z-index: 10;
+      max-width: 280px;
+    }
+
+    .info-panel p {
+      margin: 6px 0;
+      opacity: 0.8;
+    }
+
+    .info-panel strong {
+      color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay">
+    <h1>🏠 3D Street-Level Viewer</h1>
+    <p>View any address from street level in full 3D</p>
+
+    <div class="form-group">
+      <label>Property Address</label>
+      <input
+        type="text"
+        id="address"
+        placeholder="e.g., 350 Fifth Avenue, New York, NY"
+        value="350 Fifth Avenue, New York, NY"
+      >
+    </div>
+
+    <button onclick="searchAddress()">View Property</button>
+
+    <div class="view-controls">
+      <button class="view-btn active" data-view="street" onclick="setView('street')">Street</button>
+      <button class="view-btn" data-view="close" onclick="setView('close')">Close-up</button>
+      <button class="view-btn" data-view="aerial" onclick="setView('aerial')">Aerial</button>
+      <button class="view-btn" data-view="orbit" onclick="toggleOrbit()">Orbit</button>
+    </div>
+
+    <div class="form-group" style="margin-top: 12px;">
+      <label>View From Direction (override)</label>
+      <div style="display: flex; gap: 6px;">
+        <button class="view-btn" onclick="setHeading(0)">South→N</button>
+        <button class="view-btn" onclick="setHeading(90)">West→E</button>
+        <button class="view-btn" onclick="setHeading(180)">North→S</button>
+        <button class="view-btn" onclick="setHeading(270)">East→W</button>
+      </div>
+    </div>
+
+    <div id="status"></div>
+    <div id="addressDisplay"></div>
+
+    <div class="quick-links">
+      <button class="quick-btn" onclick="setAddress('Empire State Building, New York, NY')">Empire State Bldg</button>
+      <button class="quick-btn" onclick="setAddress('Big Ben, London, UK')">Big Ben</button>
+      <button class="quick-btn" onclick="setAddress('CN Tower, Toronto, Canada')">CN Tower</button>
+      <button class="quick-btn" onclick="setAddress('Eiffel Tower, Paris, France')">Eiffel Tower</button>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <p><strong>Controls:</strong></p>
+    <p>🖱️ Drag: Pan around</p>
+    <p>🖱️ Scroll: Zoom in/out</p>
+    <p>🖱️ Right-click + Drag: Rotate</p>
+    <p>🖱️ Middle-click + Drag: Tilt</p>
+  </div>
+
+  <!-- Google's recommended bootstrap loader -->
+  <script>
+    (g => {
+      var h, a, k, p = "The Google Maps JavaScript API",
+        c = "google", l = "importLibrary", q = "__ib__",
+        m = document, b = window;
+      b = b[c] || (b[c] = {});
+      var d = b.maps || (b.maps = {}),
+        r = new Set, e = new URLSearchParams,
+        u = () => h || (h = new Promise(async (f, n) => {
+          await (a = m.createElement("script"));
+          e.set("libraries", [...r] + "");
+          for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+          e.set("callback", c + ".maps." + q);
+          a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+          d[q] = f;
+          a.onerror = () => h = n(Error(p + " could not load."));
+          a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+          m.head.append(a);
+        }));
+      d[l] ? console.warn(p + " only loads once. Ignoring:", g)
+        : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
+    })({
+      key: "AIzaSyBtAjyXR2xk4ZKk-WxXXELy07OZZlk2P0Q",
+      v: "alpha",
+    });
+  </script>
+
+  <script>
+    let map3D = null;
+    let geocoder = null;
+    let currentLat = 0;
+    let currentLng = 0;
+    let orbitInterval = null;
+    let currentHeading = 0;
+    let currentView = 'street';
+
+    const statusDiv = document.getElementById('status');
+    const addressDisplayDiv = document.getElementById('addressDisplay');
+
+    const viewPresets = {
+      street: {
+        altitude: 30,
+        range: 150,
+        tilt: 75,
+      },
+      close: {
+        altitude: 20,
+        range: 60,
+        tilt: 78,
+      },
+      aerial: {
+        altitude: 400,
+        range: 1000,
+        tilt: 60,
+      }
+    };
+
+    async function init() {
+      const { Geocoder } = await google.maps.importLibrary('geocoding');
+      const { Map3DElement, MapMode } = await google.maps.importLibrary('maps3d');
+      await google.maps.importLibrary('streetView');
+      await google.maps.importLibrary('geometry');
+
+      geocoder = new Geocoder();
+      window._MapMode = MapMode;
+      window._Map3DElement = Map3DElement;
+
+      searchAddress();
+    }
+
+    async function searchAddress() {
+      if (!geocoder) {
+        statusDiv.innerHTML = '<div class="loading">Loading API...</div>';
+        return;
+      }
+
+      const address = document.getElementById('address').value.trim();
+      if (!address) {
+        statusDiv.innerHTML = '<div class="error">Please enter an address</div>';
+        return;
+      }
+
+      statusDiv.innerHTML = '<div class="loading">Searching...</div>';
+      addressDisplayDiv.innerHTML = '';
+      stopOrbit();
+
+      try {
+        const response = await geocoder.geocode({ address: address });
+
+        if (!response.results || response.results.length === 0) {
+          throw new Error('Address not found.');
+        }
+
+        const location = response.results[0];
+        currentLat = location.geometry.location.lat();
+        currentLng = location.geometry.location.lng();
+        const formattedAddress = location.formatted_address;
+
+        addressDisplayDiv.innerHTML = `
+          <div class="address-display">
+            <strong>Found:</strong><br>
+            ${formattedAddress}
+          </div>
+        `;
+
+        // Auto-detect front of house from nearest street
+        statusDiv.innerHTML = '<div class="loading">Finding street direction...</div>';
+        currentHeading = await getStreetHeading(currentLat, currentLng);
+        load3DMap(currentLat, currentLng, formattedAddress);
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="error">${error.message}</div>`;
+        console.error('Search error:', error);
+      }
+    }
+
+    async function getStreetHeading(lat, lng) {
+      const sv = new google.maps.StreetViewService();
+      const targetLatLng = new google.maps.LatLng(lat, lng);
+
+      return new Promise((resolve) => {
+        sv.getPanorama(
+          {
+            location: targetLatLng,
+            radius: 200,
+            preference: google.maps.StreetViewPreference.NEAREST,
+            source: google.maps.StreetViewSource.OUTDOOR,
+          },
+          (data, status) => {
+            if (status !== 'OK' || !data || !data.location || !data.location.latLng) {
+              console.log('No street view panorama found, defaulting heading to 0');
+              resolve(0);
+              return;
+            }
+
+            // Heading FROM the street TO the house = front-facing direction
+            const streetLatLng = data.location.latLng;
+            const heading = google.maps.geometry.spherical.computeHeading(
+              streetLatLng,
+              targetLatLng
+            );
+
+            const normalized = (heading + 360) % 360;
+            console.log(
+              `Street panorama at ${streetLatLng.lat().toFixed(5)}, ${streetLatLng.lng().toFixed(5)}. ` +
+              `Heading to house: ${normalized.toFixed(1)}°`
+            );
+            resolve(normalized);
+          }
+        );
+      });
+    }
+
+    function load3DMap(lat, lng, address) {
+      try {
+        const Map3DElement = window._Map3DElement;
+        const MapMode = window._MapMode;
+
+        if (map3D && map3D.parentNode) {
+          map3D.parentNode.removeChild(map3D);
+          map3D = null;
+        }
+
+        const preset = viewPresets[currentView] || viewPresets.street;
+
+        map3D = new Map3DElement({
+          center: {
+            lat: lat,
+            lng: lng,
+            altitude: preset.altitude
+          },
+          range: preset.range,
+          tilt: preset.tilt,
+          heading: currentHeading,
+          mode: MapMode.SATELLITE,
+        });
+
+        document.body.append(map3D);
+
+        statusDiv.innerHTML = `<div class="success">✓ Loaded (heading: ${currentHeading.toFixed(0)}°)</div>`;
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        console.error('Map error:', error);
+      }
+    }
+
+    function setView(viewName) {
+      stopOrbit();
+      currentView = viewName;
+
+      document.querySelectorAll('.view-btn[data-view]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewName);
+      });
+      document.querySelector('[data-view="orbit"]').classList.remove('active');
+
+      if (!map3D) return;
+
+      const preset = viewPresets[viewName];
+      if (!preset) return;
+
+      load3DMap(currentLat, currentLng, '');
+      statusDiv.innerHTML = `<div class="success">✓ View: ${viewName} (heading: ${currentHeading.toFixed(0)}°)</div>`;
+    }
+
+    function setHeading(heading) {
+      currentHeading = heading;
+      if (map3D) {
+        map3D.heading = heading;
+        statusDiv.innerHTML = `<div class="success">✓ Heading: ${heading}°</div>`;
+      }
+    }
+
+    function toggleOrbit() {
+      const orbitBtn = document.querySelector('[data-view="orbit"]');
+
+      if (orbitInterval) {
+        stopOrbit();
+        return;
+      }
+
+      orbitBtn.classList.add('active');
+      document.querySelectorAll('.view-btn:not([data-view="orbit"])').forEach(b => b.classList.remove('active'));
+
+      orbitInterval = setInterval(() => {
+        if (!map3D) return;
+        currentHeading = (currentHeading + 0.3) % 360;
+        map3D.heading = currentHeading;
+      }, 16);
+    }
+
+    function stopOrbit() {
+      if (orbitInterval) {
+        clearInterval(orbitInterval);
+        orbitInterval = null;
+      }
+      const orbitBtn = document.querySelector('[data-view="orbit"]');
+      if (orbitBtn) orbitBtn.classList.remove('active');
+    }
+
+    function setAddress(address) {
+      document.getElementById('address').value = address;
+      searchAddress();
+    }
+
+    document.getElementById('address').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchAddress();
+    });
+
+    init();
+  </script>
+</body>
+</html>
