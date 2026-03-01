@@ -1,0 +1,163 @@
+AMD CLOUD PIPELINE — FILE MANIFEST
+===================================
+
+Core Pipeline
+─────────────
+config.py               - Configuration: paths, device, model settings, NYUv2 classes
+utils.py                - Utilities: download images, hash job IDs, save depth maps
+pipeline.py             - Main orchestrator: runs full pipeline, aggregates results
+main.py                 - FastAPI server with REST endpoints
+
+Model Inference
+───────────────
+depth_inference.py      - Depth Anything V2: RGB → depth maps
+dformer_inference.py    - DFormerV2: RGB + depth → semantic features + room classification
+sam3d_inference.py      - SAM 3D: RGB + depth → segmentation → 3D point clouds → .glb
+
+Automation & Deployment
+───────────────────────
+watch.py                - Monitor workspace/image_urls.json for SSH uploads
+run.sh                  - Startup script: ./run.sh [server|watch|process|test]
+requirements.txt        - Python dependencies
+
+Documentation
+──────────────
+README.md               - Complete usage guide and API reference
+SETUP.md                - AMD Cloud instance setup instructions
+FILE_MANIFEST.txt       - This file
+example_urls.json       - Example image URL format
+
+Configuration & Ignore
+──────────────────────
+.gitignore              - Exclude outputs/, checkpoints/, __pycache__/
+
+Runtime Directories (Created on First Run)
+────────────────────────────────────────────
+outputs/{job_id}/
+  ├── pipeline_result.json
+  ├── property_summary.json      ← Input for Claude realtor script
+  ├── model.glb                   ← 3D reconstruction
+  ├── images/
+  ├── depth/
+  ├── segmentation/
+  └── features/
+
+workspace/
+  ├── image_urls.json            ← SSH-uploaded URLs (watch.py monitors this)
+  └── {job_id}_summary.json       ← Output after watch.py processing
+
+
+QUICK START
+───────────
+
+1. Copy entire amd_cloud/ to AMD cloud instance:
+   rsync -av amd_cloud/ user@instance:/home/user/flipperzillow/amd_cloud/
+
+2. Follow SETUP.md to install dependencies
+
+3. Start server:
+   ./run.sh server
+
+4. Or run watcher:
+   ./run.sh watch
+
+5. Call API:
+   curl -X POST http://localhost:8001/process \
+     -H "Content-Type: application/json" \
+     -d '{"image_urls": ["https://...", "https://..."]}'
+
+
+API ENDPOINTS
+─────────────
+
+POST  /process                  - Full pipeline
+POST  /depth                    - Depth Anything only
+POST  /features                 - DFormerV2 only
+POST  /reconstruct              - SAM 3D only
+GET   /jobs/{job_id}            - Get result object
+GET   /jobs/{job_id}/model.glb  - Download .glb file
+GET   /jobs/{job_id}/summary    - Get property_summary.json
+GET   /health                   - Health check
+
+
+PIPELINE FLOW
+─────────────
+
+Image URLs (from Next.js API response)
+  ↓ download_images() in utils.py
+Image files (.jpg)
+  ↓ depth_inference.process_images()
+Depth maps (.npy, .png)
+  ↓ dformer_inference.process_images()
+Per-image features (.json)
+  ├→ property_summary.json (aggregated)
+  │    ↓ sent to Claude API
+  │    ↓ Claude generates realtor script
+  ↓ sam3d_inference.build_glb()
+3D Model (.glb)
+  ↓ returned to Next.js frontend
+  ↓ displayed in WebGL/Three.js viewer
+
+
+TYPICAL RESPONSE OBJECT
+──────────────────────
+
+{
+  "job_id": "a1b2c3d4e5f6g7h8",
+  "output_dir": "/home/user/outputs/a1b2c3d4e5f6g7h8",
+  "property_summary": {
+    "room_count": 3,
+    "room_types": {"living_room": 2, "kitchen": 1},
+    "rooms": [...],
+    "all_detected_objects": ["sofa", "tv", "table", ...],
+    "has_natural_light": true,
+    "has_3d_model": true,
+    "glb_path": "..."
+  },
+  "glb_path": "/home/user/outputs/a1b2c3d4e5f6g7h8/model.glb",
+  "timing": {
+    "download": 5.2,
+    "depth": 12.1,
+    "dformer": 18.3,
+    "sam3d": 45.7,
+    "total": 81.3
+  }
+}
+
+
+ENVIRONMENT VARIABLES
+─────────────────────
+
+AMD_HOME        - Root directory of cloned model repos (default: ~)
+DEVICE          - torch device (default: cuda, ROCm exposes as cuda)
+HOST            - FastAPI bind address (default: 0.0.0.0)
+PORT            - FastAPI port (default: 8001)
+OUTPUT_DIR      - Output directory for job results (default: ./outputs)
+DEPTH_ENCODER   - Depth model size: vits | vitb | vitl | vitg (default: vitl)
+SAM_MODEL_TYPE  - SAM variant: vit_h (default: vit_h)
+
+
+PERFORMANCE TIPS
+────────────────
+
+Faster processing:
+  - Use DEPTH_ENCODER=vits (smaller model)
+  - Set create_mesh=false (skip mesh reconstruction)
+  - Process multiple jobs in parallel
+
+Better 3D quality:
+  - Use DEPTH_ENCODER=vitg (larger, slower)
+  - Set create_mesh=true (requires open3d)
+
+
+TROUBLESHOOTING CHECKLIST
+────────────────────────
+
+√ GPU detected: rocm-smi
+√ PyTorch+ROCm: python3 -c "import torch; print(torch.cuda.is_available())"
+√ Model paths: ./run.sh test
+√ No OOM: Use smaller models or skip SAM 3D
+√ Slow: Check rocm-smi for GPU usage
+
+
+For full documentation, see README.md and SETUP.md

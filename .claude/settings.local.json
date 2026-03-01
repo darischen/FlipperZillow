@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(pip:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(rm:*)",
+      "Bash(netstat:*)",
+      "WebSearch",
+      "WebFetch(domain:scrapfly.io)",
+      "WebFetch(domain:automatio.ai)",
+      "WebFetch(domain:www.scrapingbee.com)",
+      "WebFetch(domain:www.scrapingdog.com)",
+      "Bash(# Find and kill existing process on port 8000 netstat -ano)",
+      "Bash(npm install:*)",
+      "Bash(pkill:*)",
+      "Bash(python3:*)",
+      "Bash(lsof -i :8000)",
+      "Bash(xargs kill -9)",
+      "Bash(fuser:*)",
+      "Bash(killall python:*)",
+      "Bash(lsof:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(\"C:\\\\Users\\\\daris\\\\Desktop\\\\School\\\\flipperzillow\\\\amd_cloud\\\\FILE_MANIFEST.txt\":*)",
+      "Bash(ls -lh *.py *.sh *.txt *.md *.json)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}
