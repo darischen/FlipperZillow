@@ -1,6 +1,7 @@
 """
 DFormer RGBD semantic segmentation (NVIDIA CUDA optimized).
-Uses DFormer-Small to fit in 8GB VRAM.
+Uses DFormer-Base to fit in 8GB VRAM.
+Loads model directly as PyTorch without mmseg dependency.
 
 For 8GB VRAM RTX 3060 Ti: processes one image at a time, unloads model after.
 """
@@ -12,6 +13,8 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 from collections import Counter
+from importlib import import_module
+import importlib.util
 
 import config
 from utils import timer, log_gpu_stats
@@ -37,35 +40,150 @@ def _load_model():
     cfg_path = config.DFORMER_CFG
     ckpt_path = config.DFORMER_CKPT
 
-    # Auto-find smallest available variant
+    # Auto-find config if not found
     if not cfg_path.exists():
         configs_dir = config.DFORMER_REPO / "local_configs" / "NYUDepthv2"
         if configs_dir.exists():
-            for variant in ["DFormer_Tiny", "DFormer_Small", "DFormer_Base", "DFormer_Large"]:
+            for variant in ["DFormerv2_B", "DFormerv2_S", "DFormer_Small"]:
                 alt = configs_dir / f"{variant}.py"
                 if alt.exists():
                     cfg_path = alt
-                    ckpt_path = config.DFORMER_REPO / "checkpoints" / f"{variant}.pth"
                     print(f"[dformer] Found config: {variant}")
                     break
 
     print(f"[dformer] Loading {cfg_path.stem}...")
 
     try:
-        from mmseg.apis import init_model
+        import os
+        import time
 
-        model = init_model(str(cfg_path), str(ckpt_path), device=config.DEVICE)
-        _model = model
-        print(f"[dformer] Model loaded on {config.DEVICE}")
-        _log_vram()
+        # Add DFormer repo to sys.path FIRST before changing directories
+        sys.path.insert(0, str(config.DFORMER_REPO))
+
+        # Need to change to DFormer repo for relative imports to work
+        orig_cwd = os.getcwd()
+        os.chdir(config.DFORMER_REPO)
+
+        try:
+
+            # Load the base config module
+            base_module = import_module("local_configs._base_")
+            C = base_module.C
+
+            # Load the dataset config module
+            dataset_module = import_module("local_configs._base_.datasets.NYUDepthv2")
+            # This updates C with dataset-specific config
+
+            # Load the model config by reading and modifying the file
+            with open(cfg_path, 'r') as f:
+                config_code = f.read()
+
+            # Remove the relative import line (first line usually)
+            # Replace "from .._base_..." with pass to avoid relative import errors
+            lines = config_code.split('\n')
+            modified_lines = []
+            for line in lines:
+                if 'from ..' in line and 'import' in line:
+                    modified_lines.append('# ' + line)  # Comment out relative imports
+                else:
+                    modified_lines.append(line)
+            config_code = '\n'.join(modified_lines)
+
+            # Execute the config file with C in the namespace
+            config_ns = {
+                '__name__': '__main__',
+                '__file__': str(cfg_path),
+                'C': C,
+                'config': C,
+                'osp': os.path,
+                'os': os,
+                'time': time,
+                'np': __import__('numpy'),
+            }
+            exec(config_code, config_ns)
+            cfg = config_ns['C']
+
+            print(f"[dformer] Config loaded: {cfg.backbone}")
+
+            # Remove any previously imported 'utils' from sys.modules to avoid conflicts
+            # with the local utils.py in nvidia_local directory
+            if 'utils' in sys.modules:
+                del sys.modules['utils']
+            if 'utils.init_func' in sys.modules:
+                del sys.modules['utils.init_func']
+            if 'utils.load_utils' in sys.modules:
+                del sys.modules['utils.load_utils']
+            if 'utils.engine' in sys.modules:
+                del sys.modules['utils.engine']
+            if 'utils.engine.logger' in sys.modules:
+                del sys.modules['utils.engine.logger']
+
+            # Try importing with mmcv, but if it fails, fall back to heuristic
+            try:
+                # Import model builder from local DFormer repo
+                # Now that we've cleared conflicting modules, this should import from DFormer's utils
+                builder_module = import_module("models.builder")
+                segmodel = builder_module.EncoderDecoder
+
+                # Create model with config
+                model = segmodel(cfg=cfg, norm_layer=torch.nn.BatchNorm2d)
+            except ImportError as mmcv_err:
+                # If mmcv is not available, we can try using the checkpoints with a simpler model
+                print(f"[dformer] MMCv import failed ({mmcv_err}), attempting fallback...")
+                raise mmcv_err
+
+            # Load checkpoint
+            if not ckpt_path.exists():
+                raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
+
+            checkpoint = torch.load(str(ckpt_path), map_location="cpu", weights_only=False)
+
+            # Extract model state dict (handle both dict and nested dict formats)
+            if isinstance(checkpoint, dict) and "model" in checkpoint:
+                state_dict = checkpoint["model"]
+            else:
+                state_dict = checkpoint
+
+            print(f"[dformer] Loading checkpoint: {ckpt_path.name}")
+            try:
+                model.load_state_dict(state_dict, strict=False)
+            except RuntimeError as load_err:
+                # If there's a shape mismatch, try loading only compatible layers
+                print(f"[dformer] State dict loading had issues: {load_err}")
+                print("[dformer] Attempting to load compatible layers only...")
+                incompatible_keys = []
+                for key, param in state_dict.items():
+                    try:
+                        if key in model.state_dict():
+                            model_param = model.state_dict()[key]
+                            if param.shape != model_param.shape:
+                                print(f"  Skipping {key}: shape mismatch {param.shape} != {model_param.shape}")
+                                incompatible_keys.append(key)
+                    except Exception as e:
+                        pass
+
+                # Load with keys that match
+                compatible_dict = {k: v for k, v in state_dict.items() if k not in incompatible_keys}
+                model.load_state_dict(compatible_dict, strict=False)
+                print(f"[dformer] Loaded {len(compatible_dict)} compatible parameters (skipped {len(incompatible_keys)})")
+
+            # Move to device
+            model = model.to(config.DEVICE).eval()
+            _model = model
+            print(f"[dformer] Model loaded on {config.DEVICE}")
+            _log_vram()
+            return _model
+
+        finally:
+            os.chdir(orig_cwd)
+
+    except Exception as e:
+        print(f"[dformer] Could not load model ({e})")
+        print("[dformer] Falling back to heuristic segmentation (no neural model)")
+        import traceback
+        traceback.print_exc()
+        _model = "fallback"
         return _model
-    except (ImportError, FileNotFoundError) as e:
-        print(f"[dformer] Could not load via mmseg ({e})")
-
-    # Fallback: use builtin analysis
-    print("[dformer] Falling back to heuristic segmentation (no neural model)")
-    _model = "fallback"
-    return _model
 
 
 def _preprocess_rgbd(rgb_path: str | Path, depth_npy_path: str | Path,
@@ -109,30 +227,30 @@ def infer_segmentation(rgb_path: str | Path, depth_npy_path: str | Path) -> np.n
 
     with torch.no_grad():
         try:
-            from mmseg.apis import inference_model
-            result = inference_model(model, str(rgb_path))
-            if hasattr(result, 'pred_sem_seg'):
-                seg = result.pred_sem_seg.data.squeeze(0).cpu().numpy()
-            else:
-                seg = result.squeeze(0).cpu().numpy()
-        except (ImportError, TypeError, AttributeError):
-            # Direct model call
-            try:
-                result = model(rgb_t, depth_t)
-            except TypeError:
-                result = model({"img": rgb_t, "depth": depth_t})
+            # Run DFormer inference with RGBD input
+            result = model(rgb_t, depth_t)
 
-            if isinstance(result, (list, tuple)):
-                result = result[0]
-            if isinstance(result, dict):
-                result = result.get("pred_sem_seg", result.get("seg_logit", next(iter(result.values()))))
+            # Handle different output formats
             if isinstance(result, torch.Tensor):
                 if result.dim() == 4:
                     seg = result.argmax(dim=1).squeeze(0).cpu().numpy()
                 else:
                     seg = result.squeeze(0).cpu().numpy()
+            elif isinstance(result, (list, tuple)):
+                result = result[0]
+                if isinstance(result, torch.Tensor):
+                    if result.dim() == 4:
+                        seg = result.argmax(dim=1).squeeze(0).cpu().numpy()
+                    else:
+                        seg = result.squeeze(0).cpu().numpy()
+                else:
+                    seg = _fallback_segmentation(rgb_path, depth_npy_path)
             else:
                 seg = _fallback_segmentation(rgb_path, depth_npy_path)
+
+        except Exception as e:
+            print(f"[dformer] Inference failed: {e}")
+            seg = _fallback_segmentation(rgb_path, depth_npy_path)
 
     return seg.astype(np.int32)
 

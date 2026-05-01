@@ -6,7 +6,17 @@ import os
 from pathlib import Path
 
 # ── Base paths ──────────────────────────────────────────────
-HOME = Path(os.environ.get("NVIDIA_HOME", Path.home()))
+# Check environment variable, then flipperzillow/models, then home directory
+_nvidia_home = os.environ.get("NVIDIA_HOME")
+if _nvidia_home:
+    HOME = Path(_nvidia_home)
+else:
+    # Try flipperzillow/models first
+    _project_models = Path(__file__).parent.parent / "models"
+    if _project_models.exists():
+        HOME = _project_models
+    else:
+        HOME = Path.home()
 
 # Model repos (clone if not present)
 DEPTH_ANYTHING_REPO = HOME / "Depth-Anything-V2"
@@ -18,8 +28,8 @@ DFORMER_REPO = HOME / "DFormer"
 DEVICE = os.environ.get("DEVICE", "cuda")
 
 # Depth Anything V2 model size: vits | vitb | vitl | vitg
-# For 8GB VRAM RTX 3060 Ti, use 'vits' (smallest, ~2.5GB)
-DEPTH_ENCODER = os.environ.get("DEPTH_ENCODER", "vits")
+# Using 'vitl' (large, 335.3M params) for better depth quality
+DEPTH_ENCODER = os.environ.get("DEPTH_ENCODER", "vitl")
 
 DEPTH_MODEL_CONFIGS = {
     "vits": {"encoder": "vits", "features": 64, "out_channels": [48, 96, 192, 384]},
@@ -32,9 +42,9 @@ DEPTH_MODEL_CONFIGS = {
 DEPTH_ANYTHING_CKPT = DEPTH_ANYTHING_REPO / "checkpoints" / f"depth_anything_v2_{DEPTH_ENCODER}.pth"
 
 # DFormer config + checkpoint
-# Try to auto-find the smallest variant to fit in 8GB
-DFORMER_CFG = DFORMER_REPO / "local_configs" / "NYUDepthv2" / "DFormer_Small.py"
-DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "DFormer_Small.pth"
+# Using DFormerv2-Base (NYU trained) for better quality
+DFORMER_CFG = DFORMER_REPO / "local_configs" / "NYUDepthv2" / "DFormerv2_B.py"
+DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Base.pth"
 
 # SAM 3D Objects config
 SAM3D_CFG = SAM3D_REPO / "checkpoints" / "hf" / "pipeline.yaml"

@@ -1,22 +1,21 @@
-# NVIDIA CUDA PyTorch (CUDA 11.8 compatible)
-# Install with: pip install -r requirements.txt
+# NVIDIA CUDA PyTorch (CUDA 12.1 compatible)
+# Fixed for Python 3.14 compatibility
 
-# PyTorch with CUDA support for RTX 3060 Ti
-# Using CUDA 12.1 (compatible with CUDA 11.8 and 13.2 drivers)
+# PyTorch with CUDA support (using latest available for cu121)
 torch==2.5.1
 torchvision==0.20.1
 torchaudio==2.5.1
 --index-url https://download.pytorch.org/whl/cu121
 
-# FastAPI server
+# FastAPI server (uvicorn without httptools extra to avoid Windows wheel issues)
 fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
+uvicorn>=0.30.0
 pydantic>=2.0
 
 # Image/data processing
 requests>=2.31
 Pillow>=10.0
-numpy>=1.24
+numpy>=1.26
 opencv-python>=4.8.0
 
 # 3D model processing
@@ -25,9 +24,6 @@ scipy>=1.11
 
 # Configuration/utils
 python-dotenv>=1.0
-
-# Optional: for better GPU memory tracking
-nvidia-ml-py3>=7.2.0
 
 # These are needed by the model repos but should be installed separately:
 # transformers (for Depth Anything V2)

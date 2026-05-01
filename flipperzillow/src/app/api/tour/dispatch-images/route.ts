@@ -4,6 +4,7 @@ import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as crypto from 'crypto';
 
 const RequestSchema = z.object({
   image_urls: z.array(z.string().url()).min(1),
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     console.log(`[dispatch] Wrote image URLs to ${tempFile}`);
 
     // Step 2: Activate conda env and run the pipeline
-    const nvidiaPipelinePath = path.resolve(process.cwd(), '..', '..', 'nvidia_local', 'pipeline.py');
+    const nvidiaPipelinePath = path.resolve(process.cwd(), '..', 'nvidia_local', 'pipeline.py');
 
     if (!fs.existsSync(nvidiaPipelinePath)) {
       return NextResponse.json({
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
           env: {
             ...process.env,
             PYTHONUNBUFFERED: '1', // Force unbuffered output
+            PYTHONIOENCODING: 'utf-8', // Windows: support Unicode characters in output
           },
         },
         (err, stdout, stderr) => {
@@ -87,26 +89,42 @@ export async function POST(req: NextRequest) {
       );
     });
 
-    // Step 3: Extract property_summary.json from output
-    // The pipeline outputs JSON to stdout, so we parse it
+    // Step 3: Extract property_summary from pipeline output directory
+    // The pipeline saves results to ~/flipperzillow_output/
     let propertySummary = {};
 
-    // Try to find JSON in the output (last JSON object should be the summary)
-    const jsonMatch = pipelineOutput.match(/\{[\s\S]*\}(?![\s\S]*\{)/); // Last JSON object
-    if (jsonMatch) {
+    const outputDir = path.resolve(process.env.HOME || process.env.USERPROFILE || '', 'flipperzillow_output');
+    const summaryPath = path.join(outputDir, 'property_summary.json');
+
+    console.log(`[dispatch] Looking for summary at: ${summaryPath}`);
+
+    if (fs.existsSync(summaryPath)) {
       try {
-        propertySummary = JSON.parse(jsonMatch[0]);
-        console.log('[dispatch] Extracted property_summary from pipeline output');
-      } catch (e) {
-        console.warn('[dispatch] Could not parse JSON from pipeline output');
-        // Try to read from the expected output file location instead
-        const outputDir = path.resolve(process.env.HOME || process.env.USERPROFILE || '', 'flipperzillow_output');
-        const summaryPath = path.join(outputDir, 'property_summary.json');
-        if (fs.existsSync(summaryPath)) {
-          propertySummary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
-          console.log(`[dispatch] Loaded property_summary from ${summaryPath}`);
+        const content = fs.readFileSync(summaryPath, 'utf-8');
+        propertySummary = JSON.parse(content);
+
+        // Log detailed info about what was found
+        console.log(`[dispatch] ✓ Loaded property_summary`);
+        if (propertySummary.room_count) {
+          console.log(`[dispatch]   Rooms found: ${propertySummary.room_count}`);
         }
+        if (propertySummary.room_types) {
+          console.log(`[dispatch]   Room types: ${JSON.stringify(propertySummary.room_types)}`);
+        }
+        if (propertySummary.all_detected_objects) {
+          console.log(`[dispatch]   Detected objects: ${propertySummary.all_detected_objects.join(', ').slice(0, 100)}...`);
+        }
+        if (propertySummary.has_natural_light !== undefined) {
+          console.log(`[dispatch]   Natural light: ${propertySummary.has_natural_light ? 'yes' : 'limited'}`);
+        }
+        if (propertySummary.overall_spaciousness) {
+          console.log(`[dispatch]   Spaciousness: ${propertySummary.overall_spaciousness}`);
+        }
+      } catch (e) {
+        console.warn(`[dispatch] Failed to parse summary file: ${e}`);
       }
+    } else {
+      console.warn(`[dispatch] Summary file not found at ${summaryPath}`);
     }
 
     // Step 4: Save to local data directory

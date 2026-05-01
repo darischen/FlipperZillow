@@ -29,7 +29,27 @@ export async function POST() {
 
     console.log('[narrate] Reading property_summary.json from:', localPath);
     const summaryJson = fs.readFileSync(localPath, 'utf-8');
+
+    if (!summaryJson.trim()) {
+      return NextResponse.json(
+        {
+          error: 'Property summary is empty. Run dispatch-images first to process images.',
+        },
+        { status: 400 },
+      );
+    }
+
     const summary = JSON.parse(summaryJson);
+
+    if (!summary.room_count) {
+      return NextResponse.json(
+        {
+          error: 'Property summary is incomplete. Run dispatch-images first.',
+        },
+        { status: 400 },
+      );
+    }
+
     console.log(`[narrate] Got property summary: ${summary.room_count} rooms`);
 
     // --- Step 2: Generate realtor script with Claude ---

@@ -1,4 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 interface PropertySummary {
   room_count: number;
@@ -47,6 +53,11 @@ ${JSON.stringify(summary, null, 2)}`,
 
   const script = response.content[0].type === 'text' ? response.content[0].text : '';
   const word_count = script.split(/\s+/).filter(Boolean).length;
+
+  // Write script to src/data/script.txt (overwrite if exists, create if not)
+  const dataDir = join(__dirname, '../../data');
+  mkdirSync(dataDir, { recursive: true });
+  writeFileSync(join(dataDir, 'script.txt'), script, 'utf-8');
 
   return { script, word_count };
 }

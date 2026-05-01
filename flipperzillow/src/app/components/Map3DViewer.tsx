@@ -13,6 +13,7 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
   const router = useRouter();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const pipelineRunning = useRef(false);
   const [currentAddress, setCurrentAddress] = useState<string>('');
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -21,44 +22,62 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
   const [narrateStatus, setNarrateStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [scriptPreview, setScriptPreview] = useState<string>('');
 
-  // Dispatch images to AMD cloud for 3D processing on page load
+  // Dispatch images first, then generate narration
   useEffect(() => {
-    if (!initialPhotos || initialPhotos.length === 0) return;
+    if (!initialPhotos || initialPhotos.length === 0) {
+      pipelineRunning.current = false;
+      return;
+    }
 
-    fetch('/api/tour/dispatch-images', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_urls: initialPhotos,
-        address: initialAddress,
-      }),
-    })
-      .then((r) => r.json())
-      .then((d) => console.log('[dispatch]', d))
-      .catch((e) => console.warn('[dispatch] failed:', e));
-  }, [initialPhotos, initialAddress]);
+    if (pipelineRunning.current) return; // Prevent double-run in React Strict Mode
 
-  // Start narration generation immediately so audio is ready while user browses
-  useEffect(() => {
-    if (!initialPhotos || initialPhotos.length === 0) return;
+    pipelineRunning.current = true;
 
-    setNarrateStatus('loading');
-    console.log('[narrate] Pre-generating narration...');
+    const runPipeline = async () => {
+      try {
+        // Step 1: Dispatch images to process with NVIDIA pipeline
+        console.log('[pipeline] Starting dispatch-images...');
+        const dispatchRes = await fetch('/api/tour/dispatch-images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_urls: initialPhotos,
+            address: initialAddress,
+          }),
+        });
 
-    fetch('/api/tour/narrate', { method: 'POST' })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`Narrate API returned ${res.status}`);
-        setScriptPreview(res.headers.get('X-Script-Preview') || '');
-        const blob = await res.blob();
+        if (!dispatchRes.ok) {
+          throw new Error(`Dispatch failed: ${dispatchRes.status}`);
+        }
+
+        const dispatchData = await dispatchRes.json();
+        console.log('[pipeline] Dispatch completed:', dispatchData);
+
+        // Step 2: Generate narration (now that property summary is populated)
+        console.log('[pipeline] Starting narrate...');
+        setNarrateStatus('loading');
+
+        const narrateRes = await fetch('/api/tour/narrate', { method: 'POST' });
+
+        if (!narrateRes.ok) {
+          throw new Error(`Narrate failed: ${narrateRes.status}`);
+        }
+
+        setScriptPreview(narrateRes.headers.get('X-Script-Preview') || '');
+        const blob = await narrateRes.blob();
         setAudioUrl(URL.createObjectURL(blob));
         setNarrateStatus('ready');
-        console.log('[narrate] Audio ready');
-      })
-      .catch((e) => {
-        console.warn('[narrate] Pre-generation failed:', e);
+        console.log('[pipeline] Narration ready');
+      } catch (error) {
+        console.error('[pipeline] Error:', error);
         setNarrateStatus('error');
-      });
-  }, [initialPhotos]);
+      } finally {
+        pipelineRunning.current = false;
+      }
+    };
+
+    runPipeline();
+  }, [initialPhotos, initialAddress]);
 
   useEffect(() => {
     if (initialized.current) return;
