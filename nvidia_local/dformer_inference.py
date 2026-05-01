@@ -148,24 +148,53 @@ def _load_model():
             try:
                 model.load_state_dict(state_dict, strict=False)
             except RuntimeError as load_err:
-                # If there's a shape mismatch, try loading only compatible layers
+                # If there's a shape mismatch, try adapting mismatched layers
                 print(f"[dformer] State dict loading had issues: {load_err}")
-                print("[dformer] Attempting to load compatible layers only...")
-                incompatible_keys = []
-                for key, param in state_dict.items():
-                    try:
-                        if key in model.state_dict():
-                            model_param = model.state_dict()[key]
-                            if param.shape != model_param.shape:
-                                print(f"  Skipping {key}: shape mismatch {param.shape} != {model_param.shape}")
-                                incompatible_keys.append(key)
-                    except Exception as e:
-                        pass
+                print("[dformer] Attempting to adapt mismatched layers...")
 
-                # Load with keys that match
-                compatible_dict = {k: v for k, v in state_dict.items() if k not in incompatible_keys}
-                model.load_state_dict(compatible_dict, strict=False)
-                print(f"[dformer] Loaded {len(compatible_dict)} compatible parameters (skipped {len(incompatible_keys)})")
+                adapted_dict = {}
+                adapted_keys = []
+                skipped_keys = []
+
+                for key, checkpoint_param in state_dict.items():
+                    if key not in model.state_dict():
+                        # Key not in model, skip
+                        skipped_keys.append(key)
+                        continue
+
+                    model_param = model.state_dict()[key]
+
+                    if checkpoint_param.shape == model_param.shape:
+                        # Shapes match, use as-is
+                        adapted_dict[key] = checkpoint_param
+                    else:
+                        # Shape mismatch - try to adapt
+                        try:
+                            if len(checkpoint_param.shape) == 4 and len(model_param.shape) == 4:
+                                # Conv weight: try padding if only input channel dim differs
+                                if (checkpoint_param.shape[0] == model_param.shape[0] and
+                                    checkpoint_param.shape[2:] == model_param.shape[2:]):
+                                    # Only input channels differ
+                                    ckpt_in = checkpoint_param.shape[1]
+                                    model_in = model_param.shape[1]
+                                    if model_in > ckpt_in:
+                                        # Pad with zeros
+                                        pad_size = model_in - ckpt_in
+                                        padding = torch.zeros((checkpoint_param.shape[0], pad_size, checkpoint_param.shape[2], checkpoint_param.shape[3]),
+                                                            dtype=checkpoint_param.dtype, device=checkpoint_param.device)
+                                        adapted_dict[key] = torch.cat([checkpoint_param, padding], dim=1)
+                                        adapted_keys.append(key)
+                                        print(f"  Adapted {key}: padded input channels {ckpt_in}→{model_in}")
+                                        continue
+                            # If adaptation failed, skip this key
+                            skipped_keys.append(key)
+                            print(f"  Skipping {key}: shape mismatch {checkpoint_param.shape} != {model_param.shape}")
+                        except Exception as e:
+                            skipped_keys.append(key)
+                            print(f"  Skipping {key}: {e}")
+
+                model.load_state_dict(adapted_dict, strict=False)
+                print(f"[dformer] Loaded {len(adapted_dict)} parameters (adapted {len(adapted_keys)}, skipped {len(skipped_keys)})")
 
             # Move to device
             model = model.to(config.DEVICE).eval()
@@ -205,12 +234,18 @@ def _preprocess_rgbd(rgb_path: str | Path, depth_npy_path: str | Path,
     depth = np.load(depth_npy_path).astype(np.float32)
     depth = cv2.resize(depth, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
 
+    # Normalize depth to 0-255 range for consistency with RGB
     d_min, d_max = depth.min(), depth.max()
     if d_max - d_min > 1e-6:
         depth = (depth - d_min) / (d_max - d_min) * 255.0
+    else:
+        depth = np.ones_like(depth) * 128.0  # constant depth -> middle gray
 
+    # For depth, use proper normalization (subtract mean, divide by std)
+    # Treat depth similar to RGB but as grayscale -> replicate to 3 channels
     depth_3ch = np.stack([depth, depth, depth], axis=-1)
-    depth_norm = (depth_3ch - mean) / std
+    # Use ImageNet stats for consistency with RGB preprocessing
+    depth_norm = (depth_3ch.astype(np.float32) - mean) / std
     depth_tensor = torch.from_numpy(depth_norm.transpose(2, 0, 1)).unsqueeze(0).float().to(config.DEVICE)
 
     return rgb_tensor, depth_tensor

@@ -42,9 +42,11 @@ DEPTH_MODEL_CONFIGS = {
 DEPTH_ANYTHING_CKPT = DEPTH_ANYTHING_REPO / "checkpoints" / f"depth_anything_v2_{DEPTH_ENCODER}.pth"
 
 # DFormer config + checkpoint
-# Using DFormerv2-Base (NYU trained) for better quality
+# Using DFormerv2-Base with NYUv2_DFormer_Base checkpoint
+# Note: There's a 96-channel mismatch in decoder (896 vs 992)
+# This is handled by loading compatible parameters only
 DFORMER_CFG = DFORMER_REPO / "local_configs" / "NYUDepthv2" / "DFormerv2_B.py"
-DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Large.pth"
+DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Base.pth"
 
 # SAM 3D Objects config
 SAM3D_CFG = SAM3D_REPO / "checkpoints" / "hf" / "pipeline.yaml"
