@@ -4,6 +4,7 @@ Includes image downloading, VRAM tracking, timing utilities.
 """
 import hashlib
 import io
+import re
 import time
 from pathlib import Path
 
@@ -29,7 +30,28 @@ def generate_job_id(urls: list[str]) -> str:
 
 
 def download_image(url: str, timeout: int = 30) -> Image.Image:
-    """Download a URL and return a PIL RGB image."""
+    """Download a URL and return a PIL RGB image.
+
+    For realtor.com CDN images (ap.rdcpix.com), upgrade to maximum resolution:
+    - Handles both formats: s.jpg (thumbnail) and rd-w<W>_h<H>.jpg (sized)
+    - Upgrades to rd-w1024_h768 (max supported by server)
+
+    Examples:
+      http://ap.rdcpix.com/...l-m123456s.jpg
+      → http://ap.rdcpix.com/...l-m123456rd-w1024_h768.jpg
+
+      http://ap.rdcpix.com/...rd-w960_h720.jpg
+      → http://ap.rdcpix.com/...rd-w1024_h768.jpg
+    """
+    # Upgrade realtor.com CDN URLs to maximum resolution (1024×768)
+    if "ap.rdcpix.com" in url:
+        if url.endswith("s.jpg"):
+            # Thumbnail format: replace s.jpg with rd-w1024_h768.jpg
+            url = url[:-5] + "rd-w1024_h768.jpg"
+        else:
+            # Sized format: replace existing size parameters
+            url = re.sub(r'rd-w\d+_h\d+', 'rd-w1024_h768', url)
+
     resp = requests.get(url, timeout=timeout, headers={
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
     })
@@ -40,7 +62,7 @@ def download_image(url: str, timeout: int = 30) -> Image.Image:
 def download_images(urls: list[str], dest_dir: Path) -> list[dict]:
     """
     Download all images into dest_dir.
-    Returns list of { index, filename, path, url, ok, error? }.
+    Returns list of { index, filename, path, url, ok, error?, size }.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     results = []
@@ -50,14 +72,18 @@ def download_images(urls: list[str], dest_dir: Path) -> list[dict]:
         entry = {"index": i, "filename": fname, "path": str(fpath), "url": url, "ok": False}
         try:
             if fpath.exists():
+                img = Image.open(fpath)
                 entry["ok"] = True
                 entry["cached"] = True
-                print(f"  [{i+1}/{len(urls)}] {fname} (cached)")
+                entry["size"] = img.size
+                print(f"  [{i+1}/{len(urls)}] {fname} (cached, {img.size[0]}×{img.size[1]})")
             else:
                 img = download_image(url)
                 img.save(fpath, "JPEG", quality=95)
                 entry["ok"] = True
-                print(f"  [{i+1}/{len(urls)}] {fname} ✓")
+                entry["size"] = img.size
+                print(f"  [{i+1}/{len(urls)}] {fname} ✓ ({img.size[0]}×{img.size[1]})")
+
         except Exception as e:
             entry["error"] = str(e)
             print(f"  [{i+1}/{len(urls)}] {fname} ✗ — {e}")

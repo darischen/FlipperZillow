@@ -46,7 +46,7 @@ DEPTH_ANYTHING_CKPT = DEPTH_ANYTHING_REPO / "checkpoints" / f"depth_anything_v2_
 # Note: There's a 96-channel mismatch in decoder (896 vs 992)
 # This is handled by loading compatible parameters only
 DFORMER_CFG = DFORMER_REPO / "local_configs" / "NYUDepthv2" / "DFormerv2_B.py"
-DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Base.pth"
+DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Large.pth"
 
 # SAM 3D Objects config
 SAM3D_CFG = SAM3D_REPO / "checkpoints" / "hf" / "pipeline.yaml"
