@@ -297,23 +297,54 @@ def segmentation_to_features(seg_map: np.ndarray, rgb_path: str | Path) -> dict:
 
 
 def _infer_room_type(detected: list[dict]) -> str:
-    """Infer room type from detected objects."""
-    labels = {d["label"] for d in detected if d["coverage_pct"] > 2.0}
+    """Infer room type from detected objects. More relaxed for real-world images."""
+    # Include objects with 0.5%+ coverage (more inclusive than 2%)
+    labels = {d["label"] for d in detected if d["coverage_pct"] > 0.5}
+    all_labels = {d["label"] for d in detected}  # All detected, regardless of coverage
 
+    # Strict matches (high confidence)
     if "bathtub" in labels or "shower_curtain" in labels or "toilet" in labels:
         return "bathroom"
-    if "bed" in labels or ("pillow" in labels and "dresser" in labels):
+    if "bed" in labels:
         return "bedroom"
-    if "fridge" in labels or ("counter" in labels and "cabinet" in labels):
+    if "fridge" in labels or ("oven" in all_labels) or ("stove" in all_labels):
         return "kitchen"
-    if "sofa" in labels or ("tv" in labels and "table" in labels):
-        return "living_room"
-    if "table" in labels and "chair" in labels and "sofa" not in labels:
-        return "dining_room"
-    if "desk" in labels or ("bookshelf" in labels and "chair" in labels):
+    if "desk" in labels:
         return "office"
-    if "door" in labels and len(labels) <= 4:
+
+    # Moderate matches (room-specific combinations)
+    if ("counter" in labels and "cabinet" in labels) or ("counter" in all_labels and "sink" in all_labels):
+        return "kitchen"
+    if ("sofa" in labels) or ("sofa" in all_labels and "tv" in all_labels):
+        return "living_room"
+    if "tv" in labels and ("table" in all_labels or "chair" in all_labels):
+        return "living_room"
+    if ("table" in labels and "chair" in labels and "sofa" not in all_labels):
+        return "dining_room"
+    if ("bookshelf" in labels and "chair" in all_labels):
+        return "office"
+
+    # Soft matches (furniture suggests living spaces)
+    if "sofa" in all_labels or "couch" in all_labels:
+        return "living_room"
+    if "table" in all_labels and "chair" in all_labels:
+        return "dining_room"
+    if "dresser" in all_labels or "nightstand" in all_labels or "night_stand" in all_labels:
+        return "bedroom"
+
+    # Minimal match (just a door)
+    if "door" in labels and len(all_labels) <= 3:
         return "hallway"
+
+    # Fallback heuristics when furniture not detected
+    # Use spatial characteristics to guess room type
+    if "window" in all_labels:
+        return "bedroom"  # Bedrooms often have windows
+    if "otherprop" in all_labels and "picture" in all_labels:
+        return "living_room"  # Pictures suggest living spaces
+    if "ceiling" in labels and len(all_labels) > 5:
+        return "living_room"  # Open rooms with varied objects
+
     return "other"
 
 

@@ -7,895 +7,838 @@
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.35,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.95,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.71,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.49,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.04,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.42,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 3.4,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.58,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.83,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 0.63,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.35,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 0.97,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.24,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.83,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.65,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.9,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.62,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 0.64,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.52,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.07,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.18,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 3,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.45,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.14,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.85,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.1,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 0.53,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.22,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.5,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.63,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.17,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.91,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.54,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.68,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.34,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.27,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.91,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 3.33,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.51,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.83,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.4,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.93,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.75,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.6,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.45,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.99,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.04,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.66,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 2.23,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.39,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 3.05,
+        "spaciousness": "compact"
       }
     },
     {
       "room_type": "other",
       "detected_objects": [
-        "wall",
-        "ceiling",
-        "floor"
+        "otherprop",
+        "wall"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 25,
-        "ceiling_coverage_pct": 25,
-        "wall_coverage_pct": 50,
-        "spaciousness": "spacious"
+        "floor_coverage_pct": 0,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 1.09,
+        "spaciousness": "compact"
       }
     }
   ],
   "all_detected_objects": [
-    "ceiling",
-    "floor",
+    "otherprop",
     "wall"
   ],
   "has_natural_light": false,
-  "overall_spaciousness": "spacious",
+  "overall_spaciousness": "compact",
   "has_3d_model": false,
   "glb_path": null
 }

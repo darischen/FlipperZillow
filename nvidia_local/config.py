@@ -44,7 +44,7 @@ DEPTH_ANYTHING_CKPT = DEPTH_ANYTHING_REPO / "checkpoints" / f"depth_anything_v2_
 # DFormer config + checkpoint
 # Using DFormerv2-Base (NYU trained) for better quality
 DFORMER_CFG = DFORMER_REPO / "local_configs" / "NYUDepthv2" / "DFormerv2_B.py"
-DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Base.pth"
+DFORMER_CKPT = DFORMER_REPO / "checkpoints" / "NYUv2_DFormer_Large.pth"
 
 # SAM 3D Objects config
 SAM3D_CFG = SAM3D_REPO / "checkpoints" / "hf" / "pipeline.yaml"
