@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -8,65 +7,28 @@ import { generateVoice } from '@/lib/elevenlabs/generateVoice';
 
 /**
  * POST /api/tour/narrate
- * 1. SSH to AMD cloud → read /root/outputs/property_summary.json
+ * Local NVIDIA version (no SSH):
+ * 1. Read property_summary.json from local src/data/
  * 2. Pass to Claude for realtor script
  * 3. Pass script to ElevenLabs TTS
  * 4. Return MP3 audio
  */
 export async function POST() {
   try {
-    // --- Step 1: SSH to AMD cloud and read property_summary.json ---
-    const host = process.env.AMD_CLOUD_HOST;
-    const keyPath = process.env.SSH_KEY_PATH;
+    // --- Step 1: Read local property_summary.json ---
+    const localPath = path.resolve(process.cwd(), 'src/data/property_summary.json');
 
-    if (!host || !keyPath) {
+    if (!fs.existsSync(localPath)) {
       return NextResponse.json(
-        { error: 'AMD_CLOUD_HOST or SSH_KEY_PATH not configured' },
-        { status: 500 },
+        {
+          error: `Property summary not found at ${localPath}. Run dispatch-images first.`,
+        },
+        { status: 404 },
       );
     }
 
-    const resolvedKey = path.isAbsolute(keyPath)
-      ? keyPath
-      : path.resolve(process.cwd(), keyPath);
-
-    if (!fs.existsSync(resolvedKey)) {
-      return NextResponse.json(
-        { error: `SSH key not found at ${resolvedKey}` },
-        { status: 500 },
-      );
-    }
-
-    const remoteCmd = 'cat /root/outputs/property_summary.json';
-    const sshArgs = [
-      '-i', resolvedKey,
-      '-o', 'ConnectTimeout=10',
-      '-o', 'StrictHostKeyChecking=no',
-      `root@${host}`,
-      remoteCmd,
-    ];
-
-    console.log(`[narrate] SSH to ${host} — reading property_summary.json`);
-
-    const summaryJson = await new Promise<string>((resolve, reject) => {
-      execFile('ssh', sshArgs, { timeout: 15000 }, (err, stdout, stderr) => {
-        if (err) {
-          console.error('[narrate] SSH error:', err.message);
-          reject(err);
-          return;
-        }
-        if (stderr) console.warn('[narrate] stderr:', stderr);
-        resolve(stdout);
-      });
-    }).catch((sshErr) => {
-      console.warn('[narrate] SSH failed, falling back to local property_summary.json:', sshErr.message);
-      const localPath = path.resolve(process.cwd(), 'src/data/property_summary.json');
-      if (!fs.existsSync(localPath)) {
-        throw new Error(`SSH failed and no local fallback found at ${localPath}`);
-      }
-      return fs.readFileSync(localPath, 'utf-8');
-    });
-
+    console.log('[narrate] Reading property_summary.json from:', localPath);
+    const summaryJson = fs.readFileSync(localPath, 'utf-8');
     const summary = JSON.parse(summaryJson);
     console.log(`[narrate] Got property summary: ${summary.room_count} rooms`);
 
@@ -75,21 +37,39 @@ export async function POST() {
     const { script, word_count } = await generateScript(summary);
     console.log(`[narrate] Script generated: ${word_count} words`);
 
-    // --- Step 3: Generate voice with ElevenLabs ---
-    console.log('[narrate] Generating voice with ElevenLabs...');
-    const audioBuffer = await generateVoice(script);
-    console.log(`[narrate] Audio generated: ${audioBuffer.length} bytes`);
+    // --- Step 3: Generate voice with Google Cloud TTS ---
+    console.log('[narrate] Generating voice with Google Cloud TTS...');
+    try {
+      const audioBuffer = await generateVoice(script);
+      console.log(`[narrate] Audio generated: ${audioBuffer.length} bytes`);
 
-    // --- Return MP3 with metadata headers ---
-    return new NextResponse(new Uint8Array(audioBuffer), {
-      status: 200,
-      headers: {
-        'Content-Type': 'audio/mpeg',
-        'Content-Length': String(audioBuffer.length),
-        'X-Script-Word-Count': String(word_count),
-        'X-Script-Preview': script.slice(0, 200).replace(/\n/g, ' '),
-      },
-    });
+      // --- Return MP3 with metadata headers ---
+      const preview = script.slice(0, 200).replace(/\n/g, ' ').replace(/[^\x00-\x7F]/g, '');
+      return new NextResponse(new Uint8Array(audioBuffer), {
+        status: 200,
+        headers: {
+          'Content-Type': 'audio/mpeg',
+          'Content-Length': String(audioBuffer.length),
+          'X-Script-Word-Count': String(word_count),
+          'X-Script-Preview': preview,
+        },
+      });
+    } catch (ttsError) {
+      // TTS failed, but return script preview so the tour still works
+      console.warn('[narrate] TTS failed, returning script preview:', ttsError);
+      const preview = script.slice(0, 200).replace(/\n/g, ' ').replace(/[^\x00-\x7F]/g, '');
+      return NextResponse.json(
+        { script, error: 'TTS unavailable' },
+        {
+          status: 200,
+          headers: {
+            'X-Script-Word-Count': String(word_count),
+            'X-Script-Preview': preview,
+            'X-TTS-Failed': 'true',
+          },
+        }
+      );
+    }
   } catch (error) {
     console.error('[narrate] Error:', error);
     return NextResponse.json(

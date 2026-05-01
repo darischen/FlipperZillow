@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-An end-to-end AI house tour experience that takes an address, scrapes real listing photos from Redfin, builds a 3D spatial environment for Apple Vision Pro, and generates an AI realtor narration with voice. The system has two parallel pipelines that merge into a unified front-end experience.
+An end-to-end AI house tour experience that takes an address, scrapes real listing photos from RapidAPI, builds a 3D spatial environment for Apple Vision Pro, and generates an AI realtor narration with voice. The system has two parallel pipelines that merge into a unified front-end experience.
 
 ---
 
@@ -12,7 +12,7 @@ An end-to-end AI house tour experience that takes an address, scrapes real listi
 User Input (Address)
         │
         ▼
-  Redfin Scraper
+  RapidAPI Scraper
   (indoor photos)
         │
         ├─────────────────────────────────┐

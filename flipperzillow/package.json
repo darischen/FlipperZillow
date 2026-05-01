@@ -12,11 +12,14 @@
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
     "@elevenlabs/react": "^0.14.1",
+    "@google/model-viewer": "^4.2.0",
     "@types/google.maps": "^3.58.1",
+    "@webspatial/core-sdk": "^1.4.0",
+    "@webspatial/react-sdk": "^1.4.0",
     "next": "^16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "three": "^0.155.0",
+    "three": "^0.182.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -29,6 +32,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.183.1",
     "@vitejs/plugin-react": "^5.1.4",
+    "@webspatial/builder": "^1.4.0",
     "@webspatial/next-plugin": "^0.1.10",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",

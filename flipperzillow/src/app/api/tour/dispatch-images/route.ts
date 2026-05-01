@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 const RequestSchema = z.object({
   image_urls: z.array(z.string().url()).min(1),
@@ -10,10 +11,12 @@ const RequestSchema = z.object({
 });
 
 /**
- * SSH into AMD cloud and write image URLs as a JSON file.
- * Reads AMD_CLOUD_HOST and SSH_KEY_PATH from .env.local.
+ * Local NVIDIA Pipeline: Call Python subprocess directly
+ * No SSH, no server needed. Just spawn the pipeline.py script.
  */
 export async function POST(req: NextRequest) {
+  let tempFile: string | null = null;
+
   try {
     const body = await req.json();
     const parsed = RequestSchema.safeParse(body);
@@ -24,110 +27,89 @@ export async function POST(req: NextRequest) {
 
     const { image_urls, address } = parsed.data;
 
-    const host = process.env.AMD_CLOUD_HOST;
-    const keyPath = process.env.SSH_KEY_PATH;
+    console.log(`[dispatch] Processing ${image_urls.length} images with local NVIDIA pipeline`);
 
-    if (!host || !keyPath) {
-      return NextResponse.json({
-        status: 'skipped',
-        reason: 'AMD_CLOUD_HOST or SSH_KEY_PATH not configured',
-      });
-    }
+    // Step 1: Write image URLs to a temp file
+    tempFile = path.join(os.tmpdir(), `flipperzillow_${Date.now()}.json`);
+    fs.writeFileSync(tempFile, JSON.stringify(image_urls));
+    console.log(`[dispatch] Wrote image URLs to ${tempFile}`);
 
-    // Resolve key path relative to project root
-    const resolvedKey = path.isAbsolute(keyPath)
-      ? keyPath
-      : path.resolve(process.cwd(), keyPath);
+    // Step 2: Activate conda env and run the pipeline
+    const nvidiaPipelinePath = path.resolve(process.cwd(), '..', '..', 'nvidia_local', 'pipeline.py');
 
-    if (!fs.existsSync(resolvedKey)) {
+    if (!fs.existsSync(nvidiaPipelinePath)) {
       return NextResponse.json({
         status: 'error',
-        error: `SSH key not found at ${resolvedKey}`,
-      });
+        error: `NVIDIA pipeline not found at ${nvidiaPipelinePath}. Make sure nvidia_local/ is in the project root.`,
+      }, { status: 500 });
     }
 
-    // Use heredoc for reliable large JSON payload upload
-    const payload = JSON.stringify({ image_urls, address });
+    console.log(`[dispatch] Running pipeline from: ${nvidiaPipelinePath}`);
 
-    // Escape single quotes for shell safety
-    const escaped = payload.replace(/'/g, "'\\''");
-    const remoteCmd = `mkdir -p /workspace && echo '${escaped}' > /workspace/image_urls.json`;
-    const sshArgs = [
-      '-i', resolvedKey,
-      '-o', 'ConnectTimeout=10',
-      '-o', 'StrictHostKeyChecking=no',
-      `root@${host}`,
-      remoteCmd,
-    ];
+    // Use conda activation: on Windows, conda.bat activates; on Unix, source activate.sh
+    const isWindows = process.platform === 'win32';
+    let pythonExePath: string;
 
-    console.log(`[dispatch] SSH to ${host} — writing ${image_urls.length} image URLs`);
+    if (isWindows) {
+      pythonExePath = path.resolve(process.env.CONDA_PREFIX || '', 'python.exe');
+    } else {
+      pythonExePath = path.resolve(process.env.CONDA_PREFIX || '', 'bin', 'python');
+    }
 
-    // Step 1: Upload image_urls.json
-    await new Promise<string>((resolve, reject) => {
-      execFile('ssh', sshArgs, { timeout: 15000 }, (err, stdout, stderr) => {
-        if (err) {
-          console.error('[dispatch] SSH error:', err.message);
-          reject(err);
-          return;
-        }
-        if (stderr) console.warn('[dispatch] stderr:', stderr);
-        console.log('[dispatch] Wrote /workspace/image_urls.json on AMD cloud');
-        resolve(stdout);
-      });
-    });
+    // Fallback: just use 'python' or 'python3' in PATH (assumes fz env is activated)
+    if (!fs.existsSync(pythonExePath)) {
+      pythonExePath = process.platform === 'win32' ? 'python' : 'python3';
+      console.log(`[dispatch] Using python from PATH: ${pythonExePath}`);
+    }
 
-    // Step 2: Execute pipeline on AMD cloud
-    console.log('[dispatch] Executing pipeline on AMD cloud...');
-
-    // Run pipeline AND retrieve result in a single SSH session to avoid reconnection timeouts.
-    // The command runs the pipeline, then prints a delimiter followed by the JSON summary.
-    const delimiter = '___SUMMARY_JSON_START___';
-    const pipelineCmd = `bash -lc 'source ~/miniconda3/etc/profile.d/conda.sh && conda activate fz && cd ~/amd_cloud_files && python3 pipeline.py /workspace/image_urls.json --skip-sam 2>&1; echo "${delimiter}"; cat /root/outputs/property_summary.json 2>/dev/null || echo "{}"'`;
-    const pipelineArgs = [
-      '-i', resolvedKey,
-      '-o', 'ConnectTimeout=10',
-      '-o', 'StrictHostKeyChecking=no',
-      '-o', 'ServerAliveInterval=30',
-      '-o', 'ServerAliveCountMax=20',
-      `root@${host}`,
-      pipelineCmd,
-    ];
-
-    const fullOutput = await new Promise<string>((resolve, reject) => {
-      execFile('ssh', pipelineArgs, { timeout: 600000, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
-        if (err) {
-          // Check if it's just stderr warnings (xFormers etc) but pipeline actually ran
-          const output = stdout || '';
-          if (output.includes('[pipeline] DONE') || output.includes(delimiter)) {
-            console.log('[dispatch] Pipeline completed (with warnings)');
-            resolve(output);
+    const pipelineOutput = await new Promise<string>((resolve, reject) => {
+      execFile(
+        pythonExePath,
+        [nvidiaPipelinePath, tempFile, '--skip-sam'],
+        {
+          timeout: 600000, // 10 minutes max
+          maxBuffer: 10 * 1024 * 1024, // 10 MB
+          env: {
+            ...process.env,
+            PYTHONUNBUFFERED: '1', // Force unbuffered output
+          },
+        },
+        (err, stdout, stderr) => {
+          if (err) {
+            console.error('[dispatch] Pipeline error:', err.message);
+            console.error('[dispatch] stderr:', stderr?.substring(0, 500));
+            reject(err);
             return;
           }
-          console.error('[dispatch] Pipeline error:', err.message);
-          console.error('[dispatch] stdout:', stdout?.substring(0, 500));
-          console.error('[dispatch] stderr:', stderr?.substring(0, 500));
-          reject(err);
-          return;
+          console.log('[dispatch] Pipeline completed successfully');
+          resolve(stdout);
         }
-        console.log('[dispatch] Pipeline completed successfully');
-        resolve(stdout);
-      });
+      );
     });
 
-    // Split output: everything before delimiter is pipeline logs, after is the JSON summary
-    const delimiterIdx = fullOutput.indexOf(delimiter);
-    const pipelineOutput = delimiterIdx >= 0 ? fullOutput.substring(0, delimiterIdx) : fullOutput;
-    const summaryOutput = delimiterIdx >= 0 ? fullOutput.substring(delimiterIdx + delimiter.length).trim() : '{}';
-
+    // Step 3: Extract property_summary.json from output
+    // The pipeline outputs JSON to stdout, so we parse it
     let propertySummary = {};
-    try {
-      propertySummary = JSON.parse(summaryOutput);
-      console.log('[dispatch] Parsed property_summary.json from pipeline output');
-    } catch (e) {
-      console.warn('[dispatch] Failed to parse property_summary.json:', summaryOutput.substring(0, 200));
+
+    // Try to find JSON in the output (last JSON object should be the summary)
+    const jsonMatch = pipelineOutput.match(/\{[\s\S]*\}(?![\s\S]*\{)/); // Last JSON object
+    if (jsonMatch) {
+      try {
+        propertySummary = JSON.parse(jsonMatch[0]);
+        console.log('[dispatch] Extracted property_summary from pipeline output');
+      } catch (e) {
+        console.warn('[dispatch] Could not parse JSON from pipeline output');
+        // Try to read from the expected output file location instead
+        const outputDir = path.resolve(process.env.HOME || process.env.USERPROFILE || '', 'flipperzillow_output');
+        const summaryPath = path.join(outputDir, 'property_summary.json');
+        if (fs.existsSync(summaryPath)) {
+          propertySummary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
+          console.log(`[dispatch] Loaded property_summary from ${summaryPath}`);
+        }
+      }
     }
 
-    // Write summary locally (no separate SCP needed)
+    // Step 4: Save to local data directory
     const dataDir = path.resolve(process.cwd(), 'src', 'data');
     fs.mkdirSync(dataDir, { recursive: true });
     const localFilePath = path.join(dataDir, 'property_summary.json');
@@ -137,17 +119,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       status: 'completed',
       image_count: image_urls.length,
-      host,
-      remote_path: '/workspace/image_urls.json',
       local_path: localFilePath,
       propertySummary,
-      pipelineOutput: pipelineOutput.substring(0, 500), // First 500 chars
+      pipelineOutput: pipelineOutput.substring(0, 500),
     });
   } catch (error) {
     console.error('[dispatch] Error:', error);
     return NextResponse.json({
       status: 'error',
       error: String(error),
-    });
+    }, { status: 500 });
+  } finally {
+    // Clean up temp file
+    if (tempFile && fs.existsSync(tempFile)) {
+      try {
+        fs.unlinkSync(tempFile);
+      } catch (e) {
+        console.warn('[dispatch] Could not delete temp file:', tempFile);
+      }
+    }
   }
 }

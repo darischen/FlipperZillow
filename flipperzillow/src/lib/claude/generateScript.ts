@@ -37,6 +37,8 @@ Then, using only facts present in the property data, describe the home in a warm
 
 Keep the narration natural, spoken, and between 100–200 words. Single flowing paragraph.
 
+IMPORTANT: Return ONLY plain text. No markdown. No asterisks, dashes, bold, italics, or any formatting. Just the spoken words exactly as they should be read aloud.
+
 Property Data:
 ${JSON.stringify(summary, null, 2)}`,
       },

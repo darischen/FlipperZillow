@@ -1,30 +1,32 @@
 export async function generateVoice(text: string): Promise<Buffer> {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-  if (!apiKey) throw new Error('ELEVENLABS_API_KEY not configured');
+  const apiKey = process.env.GOOGLE_MAPS_KEY;
+  if (!apiKey) throw new Error('GOOGLE_MAPS_KEY not configured');
 
-  const voiceId = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM';
-
-  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'xi-api-key': apiKey,
-    },
-    body: JSON.stringify({
-      text,
-      model_id: 'eleven_multilingual_v2',
-      voice_settings: {
-        stability: 0.5,
-        similarity_boost: 0.75,
-      },
-    }),
-  });
+  const response = await fetch(
+    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: { text },
+        voice: {
+          languageCode: 'en-US',
+          name: 'en-US-Neural2-C', // Professional, warm female voice
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          pitch: 0,
+          speakingRate: 1,
+        },
+      }),
+    }
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`ElevenLabs API error ${response.status}: ${errorText}`);
+    throw new Error(`Google Cloud TTS error ${response.status}: ${errorText}`);
   }
 
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  const data = await response.json() as { audioContent: string };
+  return Buffer.from(data.audioContent, 'base64');
 }
