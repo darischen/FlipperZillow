@@ -1,0 +1,24 @@
+# SLAT (Meta SAM 3D Objects) pipeline
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+transformers>=5.7.0
+
+# 3D mesh processing
+trimesh>=4.0.0
+pyfqmr>=0.1.0
+pillow>=10.0.0
+numpy>=1.24.0
+
+# FastAPI & async
+fastapi>=0.136.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.0.0
+requests>=2.31.0
+
+# Depth estimation (Phase 3)
+depth-anything>=0.1.0
+
+# Utilities
+tqdm>=4.66.0
+python-dotenv>=1.0.0
