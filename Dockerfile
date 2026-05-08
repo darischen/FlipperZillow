@@ -41,61 +41,49 @@ RUN conda install -n sam3d -y \
     matplotlib seaborn && \
     conda clean --all --yes
 
-# Install research packages — pin numpy<2.0 first (kaolin built against numpy 1.x)
-# Install xformers with --no-deps to prevent it from upgrading torch to CPU-only
+# Install research packages and core dependencies
+# numpy<2.0 is pinned because kaolin was built against numpy 1.x
 RUN conda run -n sam3d python -m pip install --no-cache-dir \
     "numpy<2.0" \
     transformers gradio av \
     "utils3d" --no-deps \
     tqdm einops timm opencv-python-headless \
-    loguru easydict roma optree
-RUN conda run -n sam3d python -m pip install --no-cache-dir --no-deps xformers spconv-cu121
+    loguru easydict roma optree \
+    --no-cache-dir --no-deps xformers spconv-cu121
 
-# Install kaolin from NVIDIA wheel server
+# Install kaolin from NVIDIA wheel server and pin numpy again (kaolin may pull numpy 2.x)
 RUN conda run -n sam3d python -m pip install --no-cache-dir \
     kaolin==0.17.0 \
-    --find-links https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.5.1_cu121.html
+    --find-links https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.5.1_cu121.html && \
+    conda run -n sam3d python -m pip install --no-cache-dir "numpy<2.0"
 
-# Pin numpy<2.0 again after kaolin (kaolin may pull numpy 2.x)
-RUN conda run -n sam3d python -m pip install --no-cache-dir "numpy<2.0"
-
-# Install MoGe depth model (required by pipeline.yaml)
+# Install MoGe, pytorch3d (takes ~10-15 min to compile), and gsplat
+# pytorch3d must be from source (conda overwrites CUDA PyTorch with CPU-only)
 RUN conda run -n sam3d python -m pip install --no-cache-dir \
-    "git+https://github.com/microsoft/MoGe.git@a8c37341bc0325ca99b9d57981cc3bb2bd3e255b" --no-deps
+    "git+https://github.com/microsoft/MoGe.git@a8c37341bc0325ca99b9d57981cc3bb2bd3e255b" --no-deps && \
+    conda run -n sam3d python -m pip install --no-cache-dir --no-build-isolation \
+    "git+https://github.com/facebookresearch/pytorch3d.git@stable" && \
+    conda run -n sam3d python -m pip install --no-cache-dir "gsplat==1.0.0"
 
-# Install pytorch3d from source via pip (NOT conda — conda overwrites CUDA PyTorch with CPU-only)
-# This step takes ~10-15 minutes to compile
-RUN conda run -n sam3d python -m pip install --no-cache-dir --no-build-isolation \
-    "git+https://github.com/facebookresearch/pytorch3d.git@stable"
-
-# Install gsplat from PyPI (prebuilt wheels — git source build fails without GPU at build-time)
-RUN conda run -n sam3d python -m pip install --no-cache-dir "gsplat==1.0.0"
-
-# Force reinstall pybind11 via pip (conda installs dist-info only, not the Python module)
-RUN conda run -n sam3d python -m pip install pybind11 --force-reinstall
-
-# Re-pin CUDA torch after pip installs (xformers/spconv may have upgraded to CPU-only)
-RUN conda install -n sam3d -c pytorch -c nvidia \
+# Force reinstall pybind11 and re-pin CUDA torch (xformers/spconv may have upgraded to CPU-only)
+RUN conda run -n sam3d python -m pip install --no-cache-dir pybind11 --force-reinstall && \
+    conda install -n sam3d -c pytorch -c nvidia \
     "pytorch=2.5.1=py3.10_cuda12.1*" pytorch-cuda=12.1 torchvision torchaudio -y && \
     conda clean --all --yes
 
-# Ensure pip is back in sam3d (conda re-install can drop it) and reinstall packages
-# that may have been lost when conda re-solved the env. Then replace utils3d 0.1.x
-# (PyPI version lacks the utils3d.numpy submodule that sam3d_objects imports) with
-# the git version 1.7 which has it.
-RUN conda install -n sam3d pip -y && conda clean --all --yes
-RUN conda run -n sam3d python -m pip install --no-cache-dir \
+# Reinstall pip and sam3d_objects pipeline dependencies
+# Replace utils3d 0.1.x (PyPI version lacks utils3d.numpy submodule) with git version 1.7
+RUN conda install -n sam3d pip -y && conda clean --all --yes && \
+    conda run -n sam3d python -m pip install --no-cache-dir \
     "transformers<5" tqdm einops timm "numpy<2.0" moderngl \
     loguru easydict roma optree opencv-python-headless av gradio \
-    open3d
-# sam3d_objects pipeline dependencies discovered via iterative import testing
-RUN conda run -n sam3d python -m pip install --no-cache-dir \
+    open3d \
     astor plyfile fvcore point-cloud-utils scikit-image \
     lightning rootutils polyscope pyrender pymeshfix xatlas \
     OpenEXR panda3d-gltf roma einops-exts \
-    pccm cumm-cu121 pyvista igraph
-RUN conda run -n sam3d python -m pip uninstall -y utils3d || true
-RUN conda run -n sam3d python -m pip install --no-cache-dir --no-deps \
+    pccm cumm-cu121 pyvista igraph && \
+    conda run -n sam3d python -m pip uninstall -y utils3d || true && \
+    conda run -n sam3d python -m pip install --no-cache-dir --no-deps \
     "git+https://github.com/EasternJournalist/utils3d.git"
 
 # Copy project files
