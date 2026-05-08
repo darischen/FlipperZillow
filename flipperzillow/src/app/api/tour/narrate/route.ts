@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { generateScript } from '@/lib/claude/generateScript';
-import { generateVoice } from '@/lib/elevenlabs/generateVoice';
+import { generateVoice } from '@/lib/googletts/generateVoice';
 
 /**
  * POST /api/tour/narrate
