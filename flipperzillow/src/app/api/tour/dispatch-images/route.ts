@@ -26,14 +26,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
 
-    const { image_urls, address } = parsed.data;
+    let { image_urls, address } = parsed.data;
 
     console.log(`[dispatch] Processing ${image_urls.length} images with local NVIDIA pipeline`);
 
-    // Step 1: Write image URLs to a temp file
+    // Upgrade realtor.com CDN URLs to high-res before passing to pipeline
+    image_urls = image_urls.map(url => {
+      if (url.includes('ap.rdcpix.com')) {
+        if (url.endsWith('s.jpg')) {
+          // Thumbnail format: replace s.jpg with rd-w1024_h768.jpg
+          return url.slice(0, -5) + 'rd-w1024_h768.jpg';
+        } else if (url.includes('rd-w')) {
+          // Already sized format: upgrade to maximum resolution
+          return url.replace(/rd-w\d+_h\d+/g, 'rd-w1024_h768');
+        }
+      }
+      return url;
+    });
+
+    console.log(`[dispatch] Upgraded ${image_urls.length} URLs to high-res format`);
+
+    // Step 1: Write upgraded image URLs to a temp file
     tempFile = path.join(os.tmpdir(), `flipperzillow_${Date.now()}.json`);
     fs.writeFileSync(tempFile, JSON.stringify(image_urls));
-    console.log(`[dispatch] Wrote image URLs to ${tempFile}`);
+    console.log(`[dispatch] Wrote upgraded URLs to ${tempFile}`);
 
     // Step 2: Activate conda env and run the pipeline
     const nvidiaPipelinePath = path.resolve(process.cwd(), '..', 'nvidia_local', 'pipeline.py');

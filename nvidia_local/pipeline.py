@@ -148,12 +148,30 @@ def run_pipeline(
     if not skip_dformer:
         print("[pipeline] Step 3/4: DFormer semantic segmentation")
         print(f"[pipeline]   Loading model...")
-        with timer() as t:
-            features = _ensure_dformer().process_images(pairs, out)
+        try:
+            with timer() as t:
+                dformer_mod = _ensure_dformer()
+                features = dformer_mod.process_images(pairs, out)
 
-        timings["dformer"] = round(t.elapsed, 3)
-        print(f"[pipeline]   Processed {len(features)} images in {t.elapsed:.1f}s")
-        print(f"[pipeline]   GPU freed (model unloaded)\n")
+            timings["dformer"] = round(t.elapsed, 3)
+
+            # Check if we got fallback results (all "other" rooms)
+            if features and all(f.get("room_type") == "other" for f in features):
+                print("[pipeline] ⚠ WARNING: DFormer produced only 'other' classifications")
+                print("[pipeline]   This usually means the model failed to load properly")
+                print("[pipeline]   Check that conda environment 'fz' is activated:")
+                print("[pipeline]     conda activate fz")
+            else:
+                print(f"[pipeline]   Processed {len(features)} images in {t.elapsed:.1f}s")
+            print(f"[pipeline]   GPU freed (model unloaded)\n")
+        except Exception as e:
+            print(f"[pipeline] ✗ DFormer error: {e}")
+            print("[pipeline] Falling back to heuristic segmentation")
+            import traceback
+            traceback.print_exc()
+            # Still continue with empty features so pipeline doesn't crash
+            features = []
+            timings["dformer"] = -1  # Negative to indicate error
     else:
         print("[pipeline] Step 3/4: Skipped (--skip-dformer)\n")
         timings["dformer"] = 0

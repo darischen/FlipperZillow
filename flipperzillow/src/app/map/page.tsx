@@ -16,6 +16,17 @@ export default function MapPage({ searchParams }: { searchParams: Promise<Search
   if (params.photos) {
     try {
       photoUrls = JSON.parse(params.photos);
+      // Upgrade realtor.com CDN URLs to high-res immediately
+      photoUrls = photoUrls.map(url => {
+        if (url.includes('ap.rdcpix.com')) {
+          if (url.endsWith('s.jpg')) {
+            return url.slice(0, -5) + 'rd-w1024_h768.jpg';
+          } else if (url.includes('rd-w')) {
+            return url.replace(/rd-w\d+_h\d+/g, 'rd-w1024_h768');
+          }
+        }
+        return url;
+      });
     } catch {
       photoUrls = [];
     }
