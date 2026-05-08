@@ -14,6 +14,7 @@ export default function ImageGallery({ address, initialPhotos = [] }: ImageGalle
 
   useEffect(() => {
     if (initialPhotos.length > 0) {
+      console.log('[ImageGallery] Displaying images:', initialPhotos.length);
       setImages(initialPhotos);
       setSelectedIndex(0);
     }

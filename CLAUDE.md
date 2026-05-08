@@ -261,28 +261,49 @@ condition (poor/fair/good/excellent). No explanation, no markdown, only JSON.
 
 ---
 
-### PHASE 6 — 3D Pipeline: SAM Segmentation → .glb Export
-**Goal:** Convert indoor photos into a 3D .glb file for WebSpatial rendering.
+### PHASE 6 — 3D Pipeline: Meta SAM 3D Objects (SLAT) → .glb Export
+**Goal:** Convert indoor photos into 3D mesh files (.glb) for WebSpatial rendering using Meta's officially-provided SAM 3D Objects checkpoints.
+
+**Setup:**
+- Checkpoints required: `slat_generator.ckpt` and `slat_decoder_mesh.pt` (from Meta's SAM 3D Objects HuggingFace)
+- These run in the `fz` conda environment with PyTorch 2.5.1 on Windows via WSL2 subprocess (see notes below)
+- Service runs on `http://localhost:8001` (separate from main FastAPI backend on 8000)
 
 **Tasks:**
-- Use SAM (Segment Anything Model) to segment key surfaces in each image
-- Use Depth Anything V2 depth maps to reconstruct point clouds per image
-- Merge point clouds and export as `.glb` using Open3D or trimesh
-- Store `.glb` output at `public/models/{address_hash}.glb`
-- Expose as `POST /generate-3d { address_hash }` → `{ glb_url: string }`
+- Build `scraper/slat_service.py`: SLAT generator + mesh decoder inference engine
+  - Load `slat_generator.ckpt` → convert image → SLAT latent representation
+  - Load `slat_decoder_mesh.pt` → decode SLAT → 3D mesh (OBJ format)
+  - Convert OBJ → GLB using `trimesh` or `pyfqmr`
+- Expose as FastAPI: `POST /decode-mesh { image_path: str }` → `{ glb_path: str, success: bool }`
+- Store `.glb` output at `public/models/{address_hash}/{room_index}.glb`
+- Update `scraper/main.py` to proxy `/decode-mesh` requests to the WSL subprocess service
+- Add a Next.js route `/api/tour/generate-3d` that orchestrates batch mesh generation
 
 **Test Criteria:**
-- Given 5 images + depth maps, outputs a valid `.glb` file
+- Given a single room image, SLAT service generates a valid `.glb` file in <60s (CPU) or <10s (GPU)
 - `.glb` loads without errors in Three.js `GLTFLoader`
-- 3D model visually resembles the source photos (rough approximation is acceptable for hackathon)
+- 3D mesh visually matches room layout and proportions (SLAT is learning-based, so quality is good)
+- Batch processing 5 images completes with aggressive memory caching (no OOM on 3060Ti 8GB)
 
 **Files to create:**
-- `scraper/reconstruct.py` (SAM + point cloud → glb)
-- Update `scraper/main.py` with `/generate-3d` route
+- `scraper/slat_service.py` (SLAT inference + OBJ→GLB conversion)
+- `scraper/slat_subprocess.py` (Windows → WSL2 subprocess manager)
+- Update `scraper/main.py` with `/decode-mesh` proxy route
+- `app/api/tour/generate-3d/route.ts` (orchestrate batch mesh generation)
 
-**Notes:**
-- For hackathon scope: a textured point cloud `.glb` is sufficient — full mesh reconstruction is a stretch goal
-- Use SAM2 if available for better segmentation quality
+**VRAM & Performance Notes:**
+- 3060Ti 8GB: Runs comfortably with batch size = 1, target image resolution 512×512
+- Peak memory: ~6.5GB during inference (model weights ~4.3GB + activations ~2.2GB)
+- Recommend CPU inference for stability; consider GPU after testing VRAM headroom
+- Aggressive `torch.cuda.empty_cache()` after each image to prevent fragmentation
+- **Cache all outputs by address hash** — never re-decode a mesh during the same session
+
+**WSL2 Setup (Windows Only):**
+- Run from Windows PowerShell: `wsl --install Ubuntu-22.04`
+- Inside WSL: `pip install torch transformers trimesh pydantic fastapi uvicorn`
+- Service started automatically via `scraper/slat_subprocess.py` on first request
+- Communications via `http://localhost:8001` (loopback bridge between Windows and WSL2)
+- See implementation notes in `scraper/slat_subprocess.py` for debugging WSL subprocess issues
 
 ---
 

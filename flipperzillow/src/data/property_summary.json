@@ -1,22 +1,24 @@
 {
-  "room_count": 52,
+  "room_count": 49,
   "room_types": {
-    "other": 52
+    "other": 49
   },
   "rooms": [
     {
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor",
+        "otherstructure"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.94,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.35,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -24,15 +26,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "otherstructure"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 0.61,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.95,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -40,15 +43,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 3.15,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.71,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -56,15 +60,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "otherstructure"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 0.93,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.49,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -72,15 +77,17 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "otherstructure",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.19,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.04,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -88,15 +95,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.72,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.42,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -104,15 +112,17 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor",
+        "otherstructure"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 3.17,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 3.4,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -120,15 +130,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.59,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.58,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -136,30 +147,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.11,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.83,
-        "spaciousness": "compact"
-      }
-    },
-    {
-      "room_type": "other",
-      "detected_objects": [
-        "otherprop"
-      ],
-      "layout": {
-        "has_window": false,
-        "has_door": false,
-        "natural_light": "limited",
-        "floor_coverage_pct": 0,
-        "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 0.63,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -167,30 +164,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.29,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.35,
-        "spaciousness": "compact"
-      }
-    },
-    {
-      "room_type": "other",
-      "detected_objects": [
-        "otherprop"
-      ],
-      "layout": {
-        "has_window": false,
-        "has_door": false,
-        "natural_light": "limited",
-        "floor_coverage_pct": 0,
-        "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 0.97,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -198,15 +181,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.77,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.24,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -214,15 +198,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.49,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.83,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -230,15 +215,17 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "otherstructure",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.23,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.65,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -246,15 +233,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.23,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.9,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -262,30 +250,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.91,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.62,
-        "spaciousness": "compact"
-      }
-    },
-    {
-      "room_type": "other",
-      "detected_objects": [
-        "otherprop"
-      ],
-      "layout": {
-        "has_window": false,
-        "has_door": false,
-        "natural_light": "limited",
-        "floor_coverage_pct": 0,
-        "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 0.64,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -293,15 +267,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.14,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.52,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -309,15 +284,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.1,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.07,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -325,15 +301,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.5,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.18,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -341,15 +318,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.39,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 3,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -357,15 +335,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.57,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.45,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -373,15 +352,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.28,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.14,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -389,15 +369,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.59,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.85,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -405,30 +386,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.44,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.1,
-        "spaciousness": "compact"
-      }
-    },
-    {
-      "room_type": "other",
-      "detected_objects": [
-        "otherprop"
-      ],
-      "layout": {
-        "has_window": false,
-        "has_door": false,
-        "natural_light": "limited",
-        "floor_coverage_pct": 0,
-        "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 0.53,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -436,15 +403,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.61,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.22,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -452,15 +420,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.6,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.5,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -468,15 +437,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.3,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.63,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -484,15 +454,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "floor",
+        "chair"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 3.57,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.17,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -500,15 +471,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.84,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.91,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -516,15 +488,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.61,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.54,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -532,15 +505,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.7,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.68,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -548,15 +522,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.46,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.34,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -564,15 +539,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.66,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.27,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -580,15 +556,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.83,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.91,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -596,15 +573,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 3.41,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 3.33,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -612,15 +590,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.94,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.51,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -628,15 +607,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.71,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.83,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -644,15 +624,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.6,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.4,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -660,15 +641,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.54,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.93,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -676,15 +658,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.42,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.75,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -692,15 +675,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.22,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.6,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -708,15 +692,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.43,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.45,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -724,15 +709,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.68,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.99,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -740,15 +726,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.79,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.04,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -756,15 +743,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.64,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.66,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -772,15 +760,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 2.72,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 2.23,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -788,15 +777,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 3.23,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.39,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -804,15 +794,16 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "floor"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 1.75,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 3.05,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     },
@@ -820,22 +811,42 @@
       "room_type": "other",
       "detected_objects": [
         "otherprop",
-        "wall"
+        "chair",
+        "otherstructure"
       ],
       "layout": {
         "has_window": false,
         "has_door": false,
         "natural_light": "limited",
-        "floor_coverage_pct": 0,
+        "floor_coverage_pct": 0.7,
         "ceiling_coverage_pct": 0,
-        "wall_coverage_pct": 1.09,
+        "wall_coverage_pct": 0,
+        "spaciousness": "compact"
+      }
+    },
+    {
+      "room_type": "other",
+      "detected_objects": [
+        "otherprop",
+        "chair",
+        "floor"
+      ],
+      "layout": {
+        "has_window": false,
+        "has_door": false,
+        "natural_light": "limited",
+        "floor_coverage_pct": 2.85,
+        "ceiling_coverage_pct": 0,
+        "wall_coverage_pct": 0,
         "spaciousness": "compact"
       }
     }
   ],
   "all_detected_objects": [
+    "chair",
+    "floor",
     "otherprop",
-    "wall"
+    "otherstructure"
   ],
   "has_natural_light": false,
   "overall_spaciousness": "compact",

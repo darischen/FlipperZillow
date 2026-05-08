@@ -15,6 +15,7 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
   const initialized = useRef(false);
   const pipelineRunning = useRef(false);
   const [currentAddress, setCurrentAddress] = useState<string>('');
+  const [localImagePaths, setLocalImagePaths] = useState<string[]>([]);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
@@ -52,6 +53,12 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
 
         const dispatchData = await dispatchRes.json();
         console.log('[pipeline] Dispatch completed:', dispatchData);
+
+        // Use local high-resolution images if available
+        if (dispatchData.local_image_paths && dispatchData.local_image_paths.length > 0) {
+          console.log('[pipeline] Using local high-res images:', dispatchData.local_image_paths.length);
+          setLocalImagePaths(dispatchData.local_image_paths);
+        }
 
         // Step 2: Generate narration (now that property summary is populated)
         console.log('[pipeline] Starting narrate...');
@@ -370,7 +377,10 @@ export default function Map3DViewer({ initialAddress = '', initialPhotos = [] }:
       />
 
       {/* Image Gallery on the right */}
-      <ImageGallery address={currentAddress} initialPhotos={initialPhotos} />
+      <ImageGallery
+        address={currentAddress}
+        initialPhotos={localImagePaths.length > 0 ? localImagePaths : initialPhotos}
+      />
 
       {/* Overlay panel — matches old_earth_view.txt layout */}
       <div

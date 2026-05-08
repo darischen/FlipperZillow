@@ -89,12 +89,14 @@ export async function POST(req: NextRequest) {
       );
     });
 
-    // Step 3: Extract property_summary from pipeline output directory
+    // Step 3: Extract property_summary and image paths from pipeline output
     // The pipeline saves results to ~/flipperzillow_output/
     let propertySummary = {};
+    let localImagePaths: string[] = [];
 
     const outputDir = path.resolve(process.env.HOME || process.env.USERPROFILE || '', 'flipperzillow_output');
     const summaryPath = path.join(outputDir, 'property_summary.json');
+    const imagesDir = path.join(outputDir, 'images');
 
     console.log(`[dispatch] Looking for summary at: ${summaryPath}`);
 
@@ -127,6 +129,25 @@ export async function POST(req: NextRequest) {
       console.warn(`[dispatch] Summary file not found at ${summaryPath}`);
     }
 
+    // Get downloaded high-resolution images as base64 data URLs
+    if (fs.existsSync(imagesDir)) {
+      try {
+        const imageFiles = fs.readdirSync(imagesDir)
+          .filter(f => f.endsWith('.jpg'))
+          .sort()
+          .map(f => {
+            const filePath = path.join(imagesDir, f);
+            const imageBuffer = fs.readFileSync(filePath);
+            const base64 = imageBuffer.toString('base64');
+            return `data:image/jpeg;base64,${base64}`;
+          });
+        localImagePaths = imageFiles;
+        console.log(`[dispatch] Found ${localImagePaths.length} downloaded images (as base64 data URLs)`);
+      } catch (e) {
+        console.warn(`[dispatch] Failed to read images directory: ${e}`);
+      }
+    }
+
     // Step 4: Save to local data directory
     const dataDir = path.resolve(process.cwd(), 'src', 'data');
     fs.mkdirSync(dataDir, { recursive: true });
@@ -138,6 +159,7 @@ export async function POST(req: NextRequest) {
       status: 'completed',
       image_count: image_urls.length,
       local_path: localFilePath,
+      local_image_paths: localImagePaths,
       propertySummary,
       pipelineOutput: pipelineOutput.substring(0, 500),
     });
