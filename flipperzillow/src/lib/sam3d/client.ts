@@ -24,30 +24,38 @@ export class SAM3DClient {
     return SAM3DClient.instance;
   }
 
-  private async convertDataUrlToFile(dataUrl: string): Promise<string> {
-    // If it's already a file path, return as-is
-    if (!dataUrl.startsWith('data:')) {
-      return dataUrl;
-    }
+  private async getImageFromOutput(imageInput: string): Promise<string> {
+    // If it's a data URL or HTTP URL, use dispatch-images to download to standard location
+    if (imageInput.startsWith('data:') || imageInput.startsWith('http://') || imageInput.startsWith('https://')) {
+      try {
+        // Use dispatch-images to download and upgrade the image
+        const response = await fetch('/api/tour/dispatch-images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_urls: [imageInput]
+          }),
+        });
 
-    // Convert data URL to blob, then upload via API for processing
-    try {
-      const response = await fetch('/api/sam3d/upload-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dataUrl }),
-      });
+        if (!response.ok) {
+          throw new Error(`Dispatch failed: ${response.status}`);
+        }
 
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status}`);
+        const result = await response.json();
+        // dispatch-images downloads to ~/flipperzillow_output/images/img_000.jpg
+        if (result.images_dir) {
+          // dispatch-images saves to src/data/images which is mounted as /app/data/images in Docker
+          return `/app/data/images/img_000.jpg`;
+        }
+        throw new Error('No images returned from dispatch');
+      } catch (error) {
+        console.warn('[SAM3D] Failed to get image from output:', error);
+        return imageInput; // Fallback
       }
-
-      const result = await response.json();
-      return result.filePath || dataUrl; // Fallback to original if conversion fails
-    } catch (error) {
-      console.warn('[SAM3D] Failed to convert data URL, using original:', error);
-      return dataUrl; // Fallback: Python backend may handle it
     }
+
+    // Otherwise assume it's already a file path
+    return imageInput;
   }
 
   async checkStatus(): Promise<SAM3DStatusResponse> {
@@ -111,8 +119,8 @@ export class SAM3DClient {
     const startTime = Date.now();
 
     try {
-      // Convert data URL to file path if needed
-      const actualImagePath = await this.convertDataUrlToFile(imagePath);
+      // Get image from output directory (downloads via dispatch-images if needed)
+      const actualImagePath = await this.getImageFromOutput(imagePath);
 
       // Ensure service is running
       const status = await this.checkStatus();
@@ -130,11 +138,13 @@ export class SAM3DClient {
 
       // Run inference via the existing generate-3d endpoint
       // For a single image, we use a simplified call
+      // Use a timestamped path so outputs go to mounted /app/data/glb_output/{sessionId}/
+      const sessionId = `session_${Date.now()}`;
       const response = await fetch('/api/tour/generate-3d', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          addressHash: 'temp', // Use temp hash for single image inference
+          addressHash: `/app/data/glb_output/${sessionId}`, // Absolute docker path for output
           imagePaths: [actualImagePath],
         }),
       });

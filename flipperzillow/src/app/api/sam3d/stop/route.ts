@@ -6,14 +6,14 @@ export async function POST() {
   try {
     console.log('[SAM3D] Stopping Docker container...');
 
-    // Stop Docker Compose
+    // Stop Docker Compose (correct path: one level up from app directory)
     try {
-      const nvdiaLocalPath = path.join(process.cwd(), 'nvidia_local');
+      const nvdiaLocalPath = path.join(process.cwd(), '..', 'nvidia_local');
       execSync('docker-compose down', {
         cwd: nvdiaLocalPath,
         timeout: 30000,
         stdio: 'pipe',
-        shell: true, // Required on Windows to execute docker-compose
+        shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash',
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);

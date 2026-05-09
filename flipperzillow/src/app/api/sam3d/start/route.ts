@@ -11,10 +11,15 @@ async function pollHealth(timeout: number): Promise<boolean> {
 
   while (Date.now() - startTime < timeout) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const response = await fetch(SLAT_HEALTH_URL, {
         method: 'GET',
-        timeout: 5000,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         return true;
@@ -32,33 +37,16 @@ async function pollHealth(timeout: number): Promise<boolean> {
 
 export async function POST() {
   try {
-    // First check if already running
-    try {
-      const statusResponse = await fetch('http://localhost:3000/api/sam3d/status', {
-        method: 'GET',
-      });
-      const status = await statusResponse.json();
-      if (status.healthy) {
-        return NextResponse.json({
-          success: true,
-          message: 'SAM3D service already running',
-          timestamp: new Date().toISOString(),
-        });
-      }
-    } catch {
-      // Status check failed, proceed with startup
-    }
-
     console.log('[SAM3D] Starting Docker container...');
 
-    // Change to nvidia_local directory and start Docker Compose
+    // Start Docker Compose (correct path: one level up from app directory)
     try {
-      const nvdiaLocalPath = path.join(process.cwd(), 'nvidia_local');
+      const nvdiaLocalPath = path.join(process.cwd(), '..', 'nvidia_local');
       execSync('docker-compose up -d', {
         cwd: nvdiaLocalPath,
         timeout: 30000,
         stdio: 'pipe',
-        shell: true, // Required on Windows to execute docker-compose
+        shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash',
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);

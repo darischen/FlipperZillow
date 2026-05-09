@@ -79,10 +79,14 @@ export async function POST(req: NextRequest) {
       console.log(`[dispatch] Using python from PATH: ${pythonExePath}`);
     }
 
+    if (!tempFile) {
+      throw new Error('Temp file path not set');
+    }
+
     const pipelineOutput = await new Promise<string>((resolve, reject) => {
       execFile(
         pythonExePath,
-        [nvidiaPipelinePath, tempFile, '--skip-sam'],
+        [nvidiaPipelinePath, tempFile as string, '--skip-sam'],
         {
           timeout: 600000, // 10 minutes max
           maxBuffer: 10 * 1024 * 1024, // 10 MB
@@ -107,7 +111,7 @@ export async function POST(req: NextRequest) {
 
     // Step 3: Extract property_summary and image paths from pipeline output
     // The pipeline saves results to ~/flipperzillow_output/
-    let propertySummary = {};
+    let propertySummary: Record<string, any> = {};
     let localImagePaths: string[] = [];
 
     const outputDir = path.resolve(process.env.HOME || process.env.USERPROFILE || '', 'flipperzillow_output');
@@ -164,7 +168,29 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 4: Save to local data directory
+    // Step 4: Copy downloaded images to src/data/images for Docker access
+    const dockerImagesDir = path.resolve(process.cwd(), 'src', 'data', 'images');
+    fs.mkdirSync(dockerImagesDir, { recursive: true });
+
+    // Copy images from pipeline output to Docker-mounted directory
+    if (fs.existsSync(imagesDir)) {
+      try {
+        const imageFiles = fs.readdirSync(imagesDir)
+          .filter(f => f.endsWith('.jpg'))
+          .sort();
+
+        imageFiles.forEach((file, index) => {
+          const srcPath = path.join(imagesDir, file);
+          const destPath = path.join(dockerImagesDir, `img_${String(index).padStart(3, '0')}.jpg`);
+          fs.copyFileSync(srcPath, destPath);
+        });
+        console.log(`[dispatch] Copied and organized ${imageFiles.length} images to ${dockerImagesDir}`);
+      } catch (e) {
+        console.warn('[dispatch] Could not copy images to Docker directory:', e);
+      }
+    }
+
+    // Save summary
     const dataDir = path.resolve(process.cwd(), 'src', 'data');
     fs.mkdirSync(dataDir, { recursive: true });
     const localFilePath = path.join(dataDir, 'property_summary.json');
@@ -176,6 +202,7 @@ export async function POST(req: NextRequest) {
       image_count: image_urls.length,
       local_path: localFilePath,
       local_image_paths: localImagePaths,
+      images_dir: dockerImagesDir,
       propertySummary,
       pipelineOutput: pipelineOutput.substring(0, 500),
     });

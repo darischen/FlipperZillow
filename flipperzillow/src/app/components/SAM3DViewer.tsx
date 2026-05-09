@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+// @ts-ignore
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 interface SAM3DViewerProps {
@@ -49,7 +50,7 @@ export default function SAM3DViewer({ glbUrl, onClose }: SAM3DViewerProps) {
     const loader = new GLTFLoader();
     loader.load(
       glbUrl,
-      (gltf) => {
+      (gltf: any) => {
         const model = gltf.scene;
 
         // Center and scale the model
@@ -82,11 +83,11 @@ export default function SAM3DViewer({ glbUrl, onClose }: SAM3DViewerProps) {
         // Cleanup on unmount
         return () => cancelAnimationFrame(animationFrameId);
       },
-      (progress) => {
+      (progress: any) => {
         const percentComplete = (progress.loaded / progress.total) * 100;
         console.log(`[SAM3DViewer] Loading: ${percentComplete.toFixed(2)}%`);
       },
-      (err) => {
+      (err: any) => {
         console.error('[SAM3DViewer] Load error:', err);
         setError('Failed to load 3D model');
         setLoading(false);

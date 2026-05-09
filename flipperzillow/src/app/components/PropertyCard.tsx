@@ -22,6 +22,21 @@ interface PropertyCardProps {
 export default function PropertyCard({ listing, onClick }: PropertyCardProps) {
   const [imgError, setImgError] = useState(false);
 
+  // Upgrade realtor.com CDN URLs to high-res before displaying
+  const upgradeImageUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    if (url.includes('ap.rdcpix.com')) {
+      if (url.endsWith('s.jpg')) {
+        return url.slice(0, -5) + 'rd-w1024_h768.jpg';
+      } else if (url.includes('rd-w')) {
+        return url.replace(/rd-w\d+_h\d+/g, 'rd-w1024_h768');
+      }
+    }
+    return url;
+  };
+
+  const thumbnailUrl = upgradeImageUrl(listing.thumbnail_url);
+
   return (
     <div
       onClick={onClick}
@@ -44,9 +59,9 @@ export default function PropertyCard({ listing, onClick }: PropertyCardProps) {
     >
       {/* Thumbnail */}
       <div style={{ position: 'relative', width: '100%', height: 200, background: '#1f2937' }}>
-        {listing.thumbnail_url && !imgError ? (
+        {thumbnailUrl && !imgError ? (
           <img
-            src={listing.thumbnail_url}
+            src={thumbnailUrl}
             alt={listing.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={() => setImgError(true)}
