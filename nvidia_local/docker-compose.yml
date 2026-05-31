@@ -17,6 +17,9 @@ services:
       - ../flipperzillow/src/data:/app/data
     environment:
       - CUDA_VISIBLE_DEVICES=0
+      # Override Dockerfile debug flags that drastically slow GPU inference
+      - CUDA_LAUNCH_BLOCKING=0
+      - TORCH_USE_CUDA_DSA=0
     deploy:
       resources:
         reservations:

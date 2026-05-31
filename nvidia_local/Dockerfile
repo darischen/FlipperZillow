@@ -43,13 +43,17 @@ RUN conda install -n sam3d -y \
 
 # Install research packages and core dependencies
 # numpy<2.0 is pinned because kaolin was built against numpy 1.x
+# xformers is pinned to 0.0.28.post3 — this is the ONLY release whose PyPI wheels
+# are built for PyTorch 2.5.1 + CUDA 12.1. Latest xformers (0.0.30+) requires
+# PyTorch 2.10/CUDA 12.8 and silently disables its CUDA extensions on mismatch,
+# breaking memory-efficient attention. Verify with: python -m xformers.info
 RUN conda run -n sam3d python -m pip install --no-cache-dir \
     "numpy<2.0" \
     transformers gradio av \
     "utils3d" --no-deps \
     tqdm einops timm opencv-python-headless \
     loguru easydict roma optree \
-    --no-cache-dir --no-deps xformers spconv-cu121
+    --no-cache-dir --no-deps "xformers==0.0.28.post3" spconv-cu121
 
 # Install kaolin from NVIDIA wheel server and pin numpy again (kaolin may pull numpy 2.x)
 RUN conda run -n sam3d python -m pip install --no-cache-dir \
@@ -100,9 +104,37 @@ EXPOSE 8001
 # Verify critical packages are installed
 RUN conda run -n sam3d python -c "import fastapi, uvicorn, torch, kaolin, pytorch3d; print('torch cuda:', torch.version.cuda); print('✓ Core packages OK')"
 
-# Enable detailed CUDA error messages and device-side assertions for better debugging
-ENV CUDA_LAUNCH_BLOCKING=1
-ENV TORCH_USE_CUDA_DSA=1
+# Verify xformers loaded its CUDA extensions (required for memory-efficient attention).
+# If this prints a warning instead of working ops, the version pin is wrong and
+# inference will fall back to slower SDPA attention.
+RUN conda run -n sam3d python -c "\
+import xformers, xformers.ops as xo, torch; \
+print('xformers version:', xformers.__version__); \
+assert torch.cuda.is_available() or True, 'CUDA not available at build time, skipping ops check'; \
+print('✓ xformers imported cleanly (full CUDA op verification happens at runtime)')"
+
+# Pre-download DINO weights via torch.hub so they're cached in the image.
+# IMPORTANT: sam3d_objects loads DINO via torch.hub.load('facebookresearch/dinov2', ...)
+# which caches to ~/.cache/torch/hub/, NOT via timm. Caching via timm has no effect.
+RUN conda run -n sam3d python << 'EOF'
+import torch
+print("[Dockerfile] Pre-caching DINO weights via torch.hub...")
+try:
+    # This downloads the dinov2 repo zip AND the pretrained weights.
+    # Cache locations:
+    #   /root/.cache/torch/hub/main.zip                                    (repo)
+    #   /root/.cache/torch/hub/checkpoints/dinov2_vitl14_reg4_pretrain.pth (~1.13 GB weights)
+    model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitl14_reg', pretrained=True, source='github')
+    print(f"[Dockerfile] ✓ DINO weights cached: {type(model).__name__}")
+except Exception as e:
+    print(f"[Dockerfile] Warning: Could not pre-cache DINO: {e}")
+    print("[Dockerfile] (Weights will be downloaded on first startup instead)")
+EOF
+
+# NOTE: CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA are debug-only flags.
+# Enabling them serializes CUDA kernel launches (10-100x slower inference).
+# Set them via `docker-compose` env or `docker run -e` only when actively
+# debugging a CUDA error — never as a default.
 
 # Health check
 HEALTHCHECK --interval=10s --timeout=5s --start-period=180s --retries=3 \

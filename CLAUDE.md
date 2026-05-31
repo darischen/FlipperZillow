@@ -1,4 +1,4 @@
-# CLAUDE.md — AI-Powered House Tour (Hackathon Project)
+# CLAUDE.md — AI-Powered House Tour
 
 ## Project Overview
 
@@ -142,7 +142,7 @@ Develop and fully test each phase before moving to the next. Each phase has a cl
 ---
 
 ### PHASE 4 — VLM Room Analysis on AMD Cloud (Qwen2-VL-7B)
-**Goal:** Run a locally-hosted HuggingFace vision-language model on AMD GPU cloud to analyze each room image + depth map and return structured JSON. This replaces a cloud vision API with a self-hosted VLM, qualifying the project for AMD hackathon prizes.
+**Goal:** Run a locally-hosted HuggingFace vision-language model on AMD GPU cloud to analyze each room image + depth map and return structured JSON. This replaces a cloud vision API with a self-hosted VLM for improved performance and privacy.
 
 #### 4a — AMD Cloud Setup & Model Deployment
 
@@ -379,7 +379,7 @@ condition (poor/fair/good/excellent). No explanation, no markdown, only JSON.
 - Build a `ProgressTracker` component that shows pipeline steps as they complete
 - Add error boundaries and retry logic for each pipeline step
 - Mobile-responsive layout for non-Vision Pro users
-- Add demo mode with a pre-processed address (for hackathon presentation reliability)
+- Add demo mode with a pre-processed address for offline testing and showcase
 
 **Test Criteria:**
 - Full end-to-end run completes for a valid Redfin address
@@ -399,7 +399,7 @@ ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=
 PYTHON_BACKEND_URL=http://localhost:8000    # local FastAPI (scraper, depth, 3D)
 AMD_VLM_URL=                    # AMD Cloud FastAPI instance (Qwen2-VL-7B)
-DEMO_ADDRESS_HASH=              # pre-processed demo for presentation
+DEMO_ADDRESS_HASH=              # pre-processed demo for offline testing
 ```
 
 ---
@@ -463,7 +463,7 @@ DEMO_ADDRESS_HASH=              # pre-processed demo for presentation
 3. **Validate all VLM outputs with Pydantic (Python) and Zod (TypeScript).** Never trust raw model JSON — always run it through the schema. Use `json-repair` as a pre-parse step before schema validation.
 4. **Cache aggressively during development.** Save all scraped images, depth maps, and VLM responses to disk by address hash to avoid re-running expensive GPU inference.
 5. **Log pipeline step timing.** Each step should log start time, end time, and success/failure. GPU inference steps should also log device name and VRAM usage.
-6. **Keep the demo mode always working.** Pre-process a known address and commit its outputs (including pre-generated VLM JSON, script, and audio) so the hackathon presentation never depends on live GPU execution.
+6. **Keep the demo mode always working.** Pre-process a known address and commit its outputs (including pre-generated VLM JSON, script, and audio) so the full pipeline can be showcased without requiring live GPU execution.
 7. **Service ports:** Python local backend on `8000`, AMD cloud VLM service on `8001` (or use `AMD_VLM_URL` env var for the full remote URL), Next.js on `3000`.
 8. **Prefer streaming responses** for long operations (script generation, TTS) using SSE or ReadableStream.
 9. **Claude is text-only in this project.** Claude handles script generation (Phase 5) and semantic search (Phase 8) using the property JSON as input — it never receives images. All image analysis is handled by Qwen2-VL on AMD GPU.
