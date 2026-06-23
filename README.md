@@ -1,4 +1,4 @@
-# FlipperZillow 🏠✨
+# FlipperZillow
 
 **Virtual property tours for everyone—no travel required.**
 
@@ -6,7 +6,7 @@ FlipperZillow is an AI-powered platform that brings property tours to people who
 
 ---
 
-## 🎯 Why FlipperZillow?
+## Why FlipperZillow?
 
 ### **For People with Mobility Challenges**
 No need to travel to properties. Explore homes from your couch with full 3D visualization and natural language Q&A. Ask questions like _"Does this house have good natural light?"_ and get instant, grounded answers.
@@ -22,7 +22,7 @@ Hold a room in your hands with Apple Vision Pro. Rotate, inspect, and explore 3D
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Installation
 
@@ -77,7 +77,7 @@ Render 3D models in WebSpatial. On visionOS, pick up and inspect rooms as spatia
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 User Query (Natural Language)
@@ -106,35 +106,35 @@ Three.js / WebSpatial                  Claude Script Generation
 
 ---
 
-## 🎯 Core Features
+## Core Features
 
-### ✨ Semantic Property Search
+### Semantic Property Search
 - Natural language property queries
 - Automatic price/beds/baths/location parsing
 - Real-time listing aggregation
 
-### 📐 3D Room Reconstruction
+### 3D Room Reconstruction
 - SAM 3D Objects for spatial understanding
 - Photogrammetry-based mesh generation
 - Interactive Three.js viewer with rotation/zoom
 - GLB export for WebSpatial
 
-### 🤖 AI-Powered Analysis
+### AI-Powered Analysis
 - Multi-model vision pipeline (Qwen2-VL on AMD GPU)
 - Room classification and condition assessment
 - Structured JSON output (room type, pros, cons, lighting, etc.)
 
-### 🗣️ Narrated Tours
+### Narrated Tours
 - Claude-generated professional scripts
 - ElevenLabs TTS with natural voice
 - Synchronized audio/visual playback
 
-### 💬 Conversational Search
+### Conversational Search
 - Ask questions about specific properties
 - Answers grounded in AI analysis (no hallucination)
 - Real-time Q&A during tours
 
-### 👁️ Apple Vision Pro Support
+### Apple Vision Pro Support
 - WebSpatial spatial rendering
 - Hold 3D rooms in your hand
 - Touch and rotate in immersive space
@@ -142,7 +142,7 @@ Three.js / WebSpatial                  Claude Script Generation
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -157,7 +157,7 @@ Three.js / WebSpatial                  Claude Script Generation
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 flipperzillow/
@@ -187,7 +187,7 @@ flipperzillow/
 
 ---
 
-## 🚀 Development Phases
+## Development Phases
 
 ### Phase 1 ✅ – Property Search UI
 - Address input with Google Places autocomplete
@@ -234,7 +234,7 @@ flipperzillow/
 
 ---
 
-## 🎬 Usage Examples
+## Usage Examples
 
 ### Example 1: Find & Explore a Property
 
@@ -259,7 +259,7 @@ During tour playback:
 
 ---
 
-## ♿ Accessibility Design
+## Accessibility Design
 
 ### For Users with Mobility Limitations
 - Full remote property exploration (no travel needed)
@@ -286,7 +286,7 @@ During tour playback:
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -327,7 +327,7 @@ python main.py
 
 ---
 
-## 📊 Performance
+## Performance
 
 | Operation | Time (GPU) | Time (CPU) |
 |-----------|-----------|-----------|
@@ -340,7 +340,7 @@ python main.py
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### 3D Model Not Loading
 - Check that the GLB file was generated successfully
@@ -364,7 +364,7 @@ python main.py
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please:
 
@@ -377,13 +377,13 @@ See [CLAUDE.md](./CLAUDE.md) for detailed development roadmap and architecture n
 
 ---
 
-## 📜 License
+## License
 
 MIT License – see [LICENSE](./LICENSE) file for details.
 
 ---
 
-## 💬 Support & Feedback
+## Support & Feedback
 
 - **Issues:** [GitHub Issues](https://github.com/yourusername/flipperzillow/issues)
 - **Email:** support@flipperzillow.example.com
@@ -391,7 +391,7 @@ MIT License – see [LICENSE](./LICENSE) file for details.
 
 ---
 
-## 🌟 Acknowledgments
+## Acknowledgments
 
 - **Meta** for SAM 3D Objects research and models
 - **Alibaba** for Depth Anything V2
@@ -404,5 +404,3 @@ MIT License – see [LICENSE](./LICENSE) file for details.
 ---
 
 **Making property exploration accessible to everyone.**
-
-Built with ❤️ for people who deserve better options.
